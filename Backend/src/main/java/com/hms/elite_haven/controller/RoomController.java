@@ -19,21 +19,21 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    // 1️⃣ Add a new room
+    // Add a new room
     @PostMapping("/add_room")
     public ResponseEntity<RoomEntity> addRoom(@RequestBody @Valid RoomEntity room) {
         RoomEntity savedRoom = roomService.addRoom(room);
         return ResponseEntity.ok(savedRoom);
     }
 
-    // 2️⃣ Update room details
+    // Update room details
     @PutMapping("/update_room")
     public ResponseEntity<RoomEntity> updateRoom(@RequestBody @Valid RoomEntity room) {
         RoomEntity updatedRoom = roomService.updateRoom(room);
         return ResponseEntity.ok(updatedRoom);
     }
 
-    // 3️⃣ Get room by ID
+    // Get room by ID
     @GetMapping("/{roomId}")
     public ResponseEntity<RoomEntity> getRoomById(@PathVariable Long roomId) {
         Optional<RoomEntity> room = roomService.getRoomById(roomId);
@@ -41,35 +41,35 @@ public class RoomController {
                    .orElse(ResponseEntity.notFound().build());
     }
 
-    // 4️⃣ Get all rooms (excluding deleted)
+    // Get all rooms (excluding deleted)
     @GetMapping("/all_rooms")
     public ResponseEntity<List<RoomEntity>> getAllRooms() {
         List<RoomEntity> rooms = roomService.getAllRooms();
         return ResponseEntity.ok(rooms);
     }
 
-    // 5️⃣ Get all rooms for a specific hotel (excluding deleted)
+    // Get all rooms for a specific hotel (excluding deleted)
     @GetMapping("/room_hotel/{hotelId}")
     public ResponseEntity<List<RoomEntity>> getRoomsByHotel(@PathVariable Long hotelId) {
         List<RoomEntity> rooms = roomService.getRoomsByHotel(hotelId);
         return ResponseEntity.ok(rooms);
     }
 
-    // 6️⃣ Get all available rooms (excluding deleted)
+    // Get all available rooms (excluding deleted)
     @GetMapping("/available_rooms")
     public ResponseEntity<List<RoomEntity>> getAvailableRooms() {
         List<RoomEntity> rooms = roomService.getAvailableRooms();
         return ResponseEntity.ok(rooms);
     }
 
-    // 7️⃣ Get available rooms by hotel (excluding deleted)
+    // Get available rooms by hotel (excluding deleted)
     @GetMapping("/available/hotel/{hotelId}")
     public ResponseEntity<List<RoomEntity>> getAvailableRoomsByHotel(@PathVariable Long hotelId) {
         List<RoomEntity> rooms = roomService.getAvailableRoomsByHotel(hotelId);
         return ResponseEntity.ok(rooms);
     }
 
-    // 8️⃣ Soft delete room
+    // Soft delete room
     @DeleteMapping("/soft_delete/{roomId}")
     public ResponseEntity<RoomEntity> softDeleteRoom(@PathVariable Long roomId) {
         Optional<RoomEntity> roomOpt = roomService.getRoomById(roomId);
@@ -80,7 +80,7 @@ public class RoomController {
         return ResponseEntity.ok(deletedRoom);
     }
 
-    // 9️⃣ Hard delete room (Admin only)
+    // Hard delete room (Admin only)
     @DeleteMapping("/hard_delete/{roomId}")
     public ResponseEntity<String> deleteRoomById(@PathVariable Long roomId) {
         roomService.deleteRoomById(roomId);

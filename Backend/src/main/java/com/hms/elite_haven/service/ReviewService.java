@@ -21,7 +21,7 @@ public class ReviewService {
     @Autowired
     private BookingDao bookingDao;
 
-    // ✅ 1. Add Review (only if user has checked-in)
+    // Add Review (only if user has checked-in)
     public ReviewEntity addReview(Long bookingId, ReviewEntity review) {
         Optional<BookingEntity> bookingOpt = bookingDao.findById(bookingId);
 
@@ -43,21 +43,27 @@ public class ReviewService {
         return reviewDao.save(review);
     }
 
-    // ✅ 2. Get all reviews for a hotel
+    // Get all reviews for a hotel
     public List<ReviewEntity> getReviewsByHotel(Long hotelId) {
         return reviewDao.findAll().stream()
                 .filter(r -> r.getHotel() != null && r.getHotel().getHotelId().equals(hotelId))
                 .toList();
     }
 
-    // ✅ 3. Get reviews by user
+    
+    // Get all reviews for a hotel
+    public List<ReviewEntity> getAllReviews() {
+        return reviewDao.findAll();
+    }
+
+    // Get reviews by user
     public List<ReviewEntity> getReviewsByUser(Long userId) {
         return reviewDao.findAll().stream()
                 .filter(r -> r.getUser() != null && r.getUser().getUserId().equals(userId))
                 .toList();
     }
 
-    // ✅ 4. Update review (only if same user)
+    // Update review (only if same user)
     public ReviewEntity updateReview(ReviewEntity updatedReview) {
         ReviewEntity existing = reviewDao.findById(updatedReview.getReviewId())
                 .orElseThrow(() -> new RuntimeException("Review not found with ID: " + updatedReview.getReviewId()));
@@ -72,7 +78,7 @@ public class ReviewService {
         return reviewDao.save(existing);
     }
 
-    // ✅ 5. Delete review (soft delete or actual delete)
+    // Delete review (soft delete or actual delete)
     public void deleteReview(Long reviewId, Long userId) {
         ReviewEntity existing = reviewDao.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found with ID: " + reviewId));
@@ -84,7 +90,7 @@ public class ReviewService {
         reviewDao.deleteById(reviewId);
     }
 
-    // ✅ 6. Calculate average rating for a hotel
+    // Calculate average rating for a hotel
     public Double getAverageRatingForHotel(Long hotelId) {
         List<ReviewEntity> reviews = getReviewsByHotel(hotelId);
 

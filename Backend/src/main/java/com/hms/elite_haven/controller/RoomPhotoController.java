@@ -19,21 +19,21 @@ public class RoomPhotoController {
     @Autowired
     private RoomPhotoService roomPhotoService;
 
-    // 1️⃣ Add a new room photo
+    // Add a new room photo
     @PostMapping("/add_photo")
     public ResponseEntity<RoomPhotoEntity> addPhoto(@RequestBody @Valid RoomPhotoEntity roomPhoto) {
         RoomPhotoEntity savedPhoto = roomPhotoService.addPhoto(roomPhoto);
         return ResponseEntity.ok(savedPhoto);
     }
 
-    // 2️⃣ Get all photos by room ID
+    // Get all photos by room ID
     @GetMapping("/room_photos/{roomId}")
     public ResponseEntity<List<RoomPhotoEntity>> getPhotosByRoomId(@PathVariable Long roomId) {
         List<RoomPhotoEntity> photos = roomPhotoService.getPhotosByRoomId(roomId);
         return ResponseEntity.ok(photos);
     }
 
-    // 3️⃣ Get photo by ID
+    // Get photo by ID
     @GetMapping("/photo/{photoId}")
     public ResponseEntity<RoomPhotoEntity> getPhotoById(@PathVariable Long photoId) {
         Optional<RoomPhotoEntity> photo = roomPhotoService.getPhotoById(photoId);
@@ -41,14 +41,14 @@ public class RoomPhotoController {
                     .orElse(ResponseEntity.notFound().build());
     }
 
-    // 4️⃣ Update photo details (example: mark as primary)
+    // Update photo details (example: mark as primary)
     @PutMapping("/update_photo")
     public ResponseEntity<RoomPhotoEntity> updatePhoto(@RequestBody @Valid RoomPhotoEntity updatedPhoto) {
         RoomPhotoEntity photo = roomPhotoService.updatePhoto(updatedPhoto);
         return ResponseEntity.ok(photo);
     }
 
-    // 5️⃣ Delete photo by ID
+    // Delete photo by ID
     @DeleteMapping("/delete_photo/{photoId}")
     public ResponseEntity<String> deletePhoto(@PathVariable Long photoId) {
         roomPhotoService.deletePhoto(photoId);

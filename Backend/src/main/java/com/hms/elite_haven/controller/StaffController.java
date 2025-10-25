@@ -19,28 +19,28 @@ public class StaffController {
     @Autowired
     private StaffService staffService;
 
-    // 1️⃣ Create a new staff (Admin only)
+    // Create a new staff (Admin only)
     @PostMapping("/create_staff")
     public ResponseEntity<StaffEntity> createStaff(@RequestBody @Valid StaffDto staffDto) {
         StaffEntity createdStaff = staffService.createStaff(staffDto);
         return ResponseEntity.ok(createdStaff);
     }
 
-    // 2️⃣ Get all staff
+    // Get all staff
     @GetMapping("/all_staffs")
     public ResponseEntity<List<StaffEntity>> getAllStaff() {
         List<StaffEntity> staffList = staffService.getAllStaff();
         return ResponseEntity.ok(staffList);
     }
 
-    // 3️⃣ Get staff by ID
+    // Get staff by ID
     @GetMapping("/staff/{staffId}")
     public ResponseEntity<StaffEntity> getStaffById(@PathVariable Long staffId) {
         StaffEntity staff = staffService.getStaffById(staffId);
         return ResponseEntity.ok(staff);
     }
 
-    // 4️⃣ Update staff details
+    // Update staff details
     @PutMapping("/update_staff/{staffId}")
     public ResponseEntity<StaffEntity> updateStaff(
             @PathVariable Long staffId,
@@ -49,14 +49,14 @@ public class StaffController {
         return ResponseEntity.ok(updatedStaff);
     }
 
-    // 5️⃣ Soft delete staff
+    // Soft delete staff
     @DeleteMapping("/delete_staff/{staffId}")
     public ResponseEntity<String> deleteStaff(@PathVariable Long staffId) {
         staffService.deleteStaff(staffId);
         return ResponseEntity.ok("Staff deleted successfully");
     }
 
-    // 6️⃣ Get staff by hotel
+    // Get staff by hotel
     @GetMapping("/hotel_staff/{hotelId}")
     public ResponseEntity<List<StaffEntity>> getStaffByHotel(@PathVariable Long hotelId) {
         List<StaffEntity> staffList = staffService.getStaffByHotel(hotelId);

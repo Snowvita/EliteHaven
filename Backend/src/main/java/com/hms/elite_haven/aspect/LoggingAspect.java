@@ -20,8 +20,7 @@ public class LoggingAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    // Pointcut for all methods in your project packages
-    @Pointcut("within(com.hms.elite_haven..*)")
+    @Pointcut("within(com.hms.elite_haven..*) && !within(com.hms.elite_haven.filter.JwtAuthFilter)")
     public void allMethods() {}
 
     // Before method execution
