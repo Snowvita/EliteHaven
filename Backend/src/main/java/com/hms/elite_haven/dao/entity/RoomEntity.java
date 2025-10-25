@@ -1,7 +1,5 @@
 package com.hms.elite_haven.dao.entity;
 
-import java.util.List;
-
 import com.hms.elite_haven.utils.RoomStatus;
 import com.hms.elite_haven.utils.RoomType;
 
@@ -14,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -62,6 +59,4 @@ public class RoomEntity {
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
-    @OneToMany(mappedBy = "room")
-    private List<BookingEntity> bookings;
 }

@@ -49,12 +49,4 @@ public class HotelEntity {
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
-    private List<RoomEntity> rooms;
-
-    @OneToMany(mappedBy = "hotel")
-    private List<ReviewEntity> reviews;
-
-    @OneToMany(mappedBy = "hotel")
-    private List<StaffEntity> staffMembers;
 }

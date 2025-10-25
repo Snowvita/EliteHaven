@@ -58,11 +58,11 @@ public class ReviewService {
     }
 
     // ✅ 4. Update review (only if same user)
-    public ReviewEntity updateReview(Long reviewId, Long userId, ReviewEntity updatedReview) {
-        ReviewEntity existing = reviewDao.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("Review not found with ID: " + reviewId));
+    public ReviewEntity updateReview(ReviewEntity updatedReview) {
+        ReviewEntity existing = reviewDao.findById(updatedReview.getReviewId())
+                .orElseThrow(() -> new RuntimeException("Review not found with ID: " + updatedReview.getReviewId()));
 
-        if (!existing.getUser().getUserId().equals(userId)) {
+        if (!existing.getUser().getUserId().equals(updatedReview.getUser().getUserId())) {
             throw new RuntimeException("You can only edit your own reviews.");
         }
 

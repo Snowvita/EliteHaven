@@ -15,7 +15,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,9 +55,11 @@ public class StaffEntity {
     @Column(name = "role")
     private String role;
 
-    @Size(max = 20)
-    @Column(name = "contact_number")
-    private String contactNumber;
+    @Column(name = "contact_number", nullable = false, unique = true)
+    @NotNull(message = "Phone number is required")
+    @Min(value = 1000000000L, message = "Phone number must be at least 6000000000")
+    @Max(value = 9999999999L, message = "Phone number must be at most 9999999999")
+    private Long contactNumber;
 
     @Email
     @Size(max = 100)
@@ -66,6 +72,4 @@ public class StaffEntity {
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
-    @OneToMany(mappedBy = "bookedByStaff")
-    private List<BookingEntity> bookings;
 }

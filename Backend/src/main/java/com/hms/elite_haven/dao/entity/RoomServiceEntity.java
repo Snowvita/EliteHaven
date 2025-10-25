@@ -33,14 +33,6 @@ public class RoomServiceEntity {
     @Column(name = "service_name")
     private String serviceName;
 
-    @Positive
-    @Column(name = "price")
-    private Double price;
-
-    @Size(max = 255)
-    @Column(name = "description")
-    private String description;
-
     @ManyToMany(mappedBy = "services")
     private List<BookingEntity> bookings;
 }

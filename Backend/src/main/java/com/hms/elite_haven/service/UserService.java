@@ -1,6 +1,5 @@
 package com.hms.elite_haven.service;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.hms.elite_haven.dao.RoleDao;
 import com.hms.elite_haven.dao.UserDao;
 import com.hms.elite_haven.dao.entity.RoleEntity;
 import com.hms.elite_haven.dao.entity.UserEntity;
@@ -23,16 +23,22 @@ public class UserService {
     private UserDao userDao;
 
     @Autowired
+    private RoleDao roleDao;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     // Register a new user
-    public UserDetailsDto registerUser(RegisterDto dto, List<RoleEntity> roles) {
+    public UserDetailsDto registerUser(RegisterDto dto) {
+                // 1. Fetch STAFF role from Role table
+        RoleEntity customerRole = roleDao.findByRoleName("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("CUSTOMER role not found"));
         UserEntity user = new UserEntity();
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
-        user.setRoles(roles);
+        user.setRoles(List.of(customerRole));
         user.setIsDeleted(0);
         userDao.save(user);
 
@@ -84,9 +90,9 @@ public class UserService {
     }
 
     // Change user password
-    public void changePassword(Long userId, ChangePasswordDto dto) {
-        UserEntity user = userDao.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    public void changePassword(ChangePasswordDto dto) {
+        UserEntity user = userDao.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getUserId()));
         if (user.getIsDeleted() == 1) throw new RuntimeException("User is deleted");
 
         // Verify old password

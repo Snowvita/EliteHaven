@@ -1,13 +1,10 @@
 package com.hms.elite_haven.dao.entity;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -31,7 +28,4 @@ public class RoleEntity {
     @Size(max = 50)
     @Column(name = "role_name", unique = true)
     private String roleName;
-
-    @ManyToMany(mappedBy = "roles")
-    private List<UserEntity> users;
 }

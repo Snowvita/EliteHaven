@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.hms.elite_haven.dao.HotelDao;
 import com.hms.elite_haven.dao.RoleDao;
 import com.hms.elite_haven.dao.StaffDao;
 import com.hms.elite_haven.dao.UserDao;
@@ -26,6 +27,9 @@ public class StaffService {
 
     @Autowired
     private RoleDao roleDao;
+
+    @Autowired
+    private HotelDao hotelDao;
 
     @Autowired
     private PasswordEncoder passwordEncoder; // Spring Security password encoder
@@ -53,6 +57,8 @@ public class StaffService {
         staff.setFullName(staffDto.getFullName());
         staff.setEmail(staffDto.getEmail());
         staff.setContactNumber(staffDto.getPhone());
+        staff.setHotel(hotelDao.findById(staffDto.getHotelId())
+                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + staffDto.getHotelId())));
         staff.setRole(staffDto.getRole());
         staff.setHiredDate(staffDto.getHiredDate() != null ? staffDto.getHiredDate() : new Timestamp(System.currentTimeMillis()));
         

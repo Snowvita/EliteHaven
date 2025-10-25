@@ -11,10 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,9 +50,13 @@ public class UserEntity {
     @Column(name = "password")
     private String password;
 
-    @Size(max = 20)
-    @Column(name = "phone")
-    private String phone;
+    
+    @NotNull(message = "Phone number is required")
+    @Min(value = 1000000000L, message = "Phone number must be at least 6000000000")
+    @Max(value = 9999999999L, message = "Phone number must be at most 9999999999")
+    @Column(name = "phone", unique = true, nullable = false)
+    private Long phone;
+
 
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;

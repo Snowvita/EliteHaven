@@ -42,10 +42,8 @@ public class RoleService {
     }
 
     // Update role name
-    public RoleEntity updateRole(Long id, String newName) {
-        RoleEntity role = getRoleById(id);
-        role.setRoleName(newName);
-        return roleDao.save(role);
+    public RoleEntity updateRole(RoleEntity roleDetails) {
+        return roleDao.save(roleDetails);
     }
 
     // Delete role

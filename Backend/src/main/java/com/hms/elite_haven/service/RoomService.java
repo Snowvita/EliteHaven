@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hms.elite_haven.dao.HotelDao;
 import com.hms.elite_haven.dao.RoomDao;
 import com.hms.elite_haven.dao.entity.RoomEntity;
 import com.hms.elite_haven.utils.RoomStatus;
@@ -16,8 +17,13 @@ public class RoomService {
     @Autowired
     private RoomDao roomDao;
 
+    @Autowired
+    private HotelDao hotelDao;
+
     // Add a new room
     public RoomEntity addRoom(RoomEntity room) {
+        room.setHotel(hotelDao.findById(room.getHotel().getHotelId())
+                .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + room.getHotel().getHotelId())));
         return roomDao.save(room);
     }
 

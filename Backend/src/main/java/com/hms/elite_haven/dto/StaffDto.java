@@ -3,7 +3,10 @@ package com.hms.elite_haven.dto;
 import java.sql.Timestamp;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,12 +26,17 @@ public class StaffDto {
     @Size(max = 100)
     private String email;
 
-    @Size(max = 20)
-    private String phone;
+    @NotNull(message = "Phone number is required")
+    @Min(value = 1000000000L, message = "Phone number must be at least 6000000000")
+    @Max(value = 9999999999L, message = "Phone number must be at most 9999999999")
+    private Long phone;
 
     @NotBlank
     @Size(max = 50)
     private String role;
+
+    @NotNull
+    private Long hotelId;
 
     private Timestamp hiredDate;
 
