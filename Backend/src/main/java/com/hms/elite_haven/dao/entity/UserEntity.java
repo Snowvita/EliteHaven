@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -61,10 +62,4 @@ public class UserEntity {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleEntity> roles;
-
-    // @OneToMany(mappedBy = "user")
-    // private List<BookingEntity> bookings;
-
-    // @OneToMany(mappedBy = "user")
-    // private List<ReviewEntity> reviews;
 }

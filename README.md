@@ -32,7 +32,7 @@ It supports multiple user roles: **Customer, Staff, and Admin**.
 
 **For Staff:**
 
-- Manage customer bookings (approve/cancel)
+- Manage customer bookings
 - Add/update/remove room details
 - Handle walk-in customer bookings
 - Assigned to specific hotels
@@ -54,6 +54,7 @@ It supports multiple user roles: **Customer, Staff, and Admin**.
 
 ---
 
+<!--
 ## Database Design
 
 The system includes the following tables:
@@ -72,4 +73,4 @@ The system includes the following tables:
 | reviews          | User reviews for rooms/hotels                |
 | staff            | Staff details (added by admin)               |
 
----
+--- -->

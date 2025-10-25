@@ -3,6 +3,7 @@ package com.hms.elite_haven.dao.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,7 +33,7 @@ public class StaffEntity {
     @Column(name = "staff_id")
     private Long staffId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
