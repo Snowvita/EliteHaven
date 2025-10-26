@@ -8,7 +8,7 @@ import { RoomModel } from '../../../models/room.model';
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './booking-form.component.html',
   styleUrls: ['./booking-form.component.css'],
 })

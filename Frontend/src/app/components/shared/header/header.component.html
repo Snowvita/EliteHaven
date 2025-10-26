@@ -60,15 +60,41 @@
         </ng-container>
 
         <!-- Admin/Staff Navigation -->
+        <!-- Admin/Staff Navigation - Minimal Header -->
         <ng-container *ngIf="getRole() === 'ADMIN' || getRole() === 'STAFF'">
-          <div class="user-info">
-            <span class="user-name">{{ getUserName() }}</span>
-            <span class="user-role">({{ getRole() }})</span>
+          <div class="admin-profile-dropdown">
+            <button class="btn-admin-profile" (click)="toggleProfileMenu()">
+              <span class="admin-avatar">{{ getUserName().charAt(0) }}</span>
+              <div class="admin-info">
+                <span class="admin-name">{{ getUserName() }}</span>
+                <span class="admin-role">{{ getRole() }}</span>
+              </div>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="admin-dropdown-menu" *ngIf="showProfileMenu">
+              <div class="admin-dropdown-header">
+                <div class="admin-dropdown-avatar">
+                  {{ getUserName().charAt(0) }}
+                </div>
+                <div class="admin-dropdown-details">
+                  <span class="admin-dropdown-name">{{ getUserName() }}</span>
+                  <span class="admin-dropdown-email">{{ getUserEmail() }}</span>
+                  <span class="admin-dropdown-role">{{ getRole() }}</span>
+                </div>
+              </div>
+              <hr class="dropdown-divider" />
+              <button
+                class="dropdown-item"
+                routerLink="/admin/profile"
+                (click)="toggleProfileMenu()"
+              >
+                <span class="icon">⚙️</span> Account Settings
+              </button>
+              <button class="dropdown-item" (click)="logout()">
+                <span class="icon">🚪</span> Logout
+              </button>
+            </div>
           </div>
-          <button (click)="navigateToDashboard()" class="btn btn-outline">
-            Dashboard
-          </button>
-          <button (click)="logout()" class="btn btn-danger">Logout</button>
         </ng-container>
       </ng-template>
     </nav>

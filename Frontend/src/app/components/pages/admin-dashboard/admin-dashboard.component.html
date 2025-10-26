@@ -1,1 +1,231 @@
-<p>admin-dashboard works!</p>
+<div class="admin-dashboard-container">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>🏨 Elite Haven</h2>
+      <p class="admin-label">Admin Panel</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a
+        routerLink="/admin-dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+      >
+        <span class="icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- Staff Management Section -->
+      <a
+        routerLink="/admin/add-staff"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="icon">➕</span>
+        <span>Add Staff</span>
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">
+        <span class="icon">👥</span>
+        <span>Manage Users</span>
+      </a>
+
+      <a routerLink="/admin/hotels" routerLinkActive="active" class="nav-item">
+        <span class="icon">🏨</span>
+        <span>Hotels</span>
+      </a>
+      <a routerLink="/admin/rooms" routerLinkActive="active" class="nav-item">
+        <span class="icon">🛏️</span>
+        <span>Rooms</span>
+      </a>
+
+      <a
+        routerLink="/admin/bookings"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="icon">📋</span>
+        <span>Bookings</span>
+      </a>
+      <a
+        routerLink="/admin/payments"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="icon">💰</span>
+        <span>Payments</span>
+      </a>
+
+      <!-- Reports Section -->
+      <a routerLink="/admin/reports" routerLinkActive="active" class="nav-item">
+        <span class="icon">📈</span>
+        <span>Reports</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar">{{ adminName.charAt(0) }}</div>
+        <div class="admin-details">
+          <p class="admin-name">{{ adminName }}</p>
+          <p class="admin-role">Administrator</p>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()">
+        <span class="icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <h1>Dashboard Overview</h1>
+      <div class="top-bar-actions">
+        <button class="btn-refresh" (click)="loadAdminData()">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading dashboard data...</p>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content" *ngIf="!isLoading">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card card-blue">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Hotels</p>
+            <p class="stat-value">{{ stats.totalHotels }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card card-green">
+          <div class="stat-icon">🛏️</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Rooms</p>
+            <p class="stat-value">{{ stats.totalRooms }}</p>
+            <p class="stat-sub">{{ stats.availableRooms }} available</p>
+          </div>
+        </div>
+
+        <div class="stat-card card-purple">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Bookings</p>
+            <p class="stat-value">{{ stats.totalBookings }}</p>
+            <p class="stat-sub">{{ stats.activeBookings }} active</p>
+          </div>
+        </div>
+
+        <div class="stat-card card-orange">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Users</p>
+            <p class="stat-value">{{ stats.totalUsers }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card card-yellow">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <p class="stat-label">Pending Bookings</p>
+            <p class="stat-value">{{ stats.pendingBookings }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card card-teal">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Revenue</p>
+            <p class="stat-value">₹{{ stats.totalRevenue }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2>Recent Bookings</h2>
+          <a routerLink="/admin/bookings" class="link-view-all">View All →</a>
+        </div>
+
+        <div class="bookings-table" *ngIf="recentBookings.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Guest Name</th>
+                <th>Hotel</th>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of recentBookings">
+                <td>#{{ booking.bookingId }}</td>
+                <td>{{ booking.user?.fullName || "N/A" }}</td>
+                <td>{{ booking.room?.hotel?.hotelName || "N/A" }}</td>
+                <td>{{ booking.room?.roomNumber || "N/A" }}</td>
+                <td>{{ formatDate(booking.checkInDate) }}</td>
+                <td>{{ formatDate(booking.checkOutDate) }}</td>
+                <td>₹{{ booking.totalPrice }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [ngClass]="{
+                      'status-confirmed': booking.status === 'CONFIRMED',
+                      'status-pending': booking.status === 'PENDING',
+                      'status-cancelled': booking.status === 'CANCELLED',
+                      'status-completed': booking.status === 'COMPLETED'
+                    }"
+                  >
+                    {{ booking.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" *ngIf="recentBookings.length === 0">
+          <p>No recent bookings</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-section">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions-grid">
+          <button class="action-card" routerLink="/admin/hotels">
+            <span class="action-icon">🏨</span>
+            <span class="action-label">Add Hotel</span>
+          </button>
+          <button class="action-card" routerLink="/admin/rooms">
+            <span class="action-icon">🛏️</span>
+            <span class="action-label">Add Room</span>
+          </button>
+          <button class="action-card" routerLink="/admin/add-staff">
+            <span class="action-icon">👤</span>
+            <span class="action-label">Add Staff</span>
+          </button>
+          <button class="action-card" routerLink="/admin/reports">
+            <span class="action-icon">📊</span>
+            <span class="action-label">Generate Report</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

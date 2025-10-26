@@ -6,7 +6,7 @@ import { BookingService } from '../../../services/booking.service';
 @Component({
   selector: 'app-my-bookings',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './my-bookings.component.html',
   styleUrls: ['./my-bookings.component.css'],
 })

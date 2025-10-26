@@ -3,16 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../services/user.service';
-import { BookingService } from '../../../services/booking.service';
 
 @Component({
-  selector: 'app-profile',
+  selector: 'app-admin-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css'],
+  templateUrl: './admin-profile.component.html',
+  styleUrls: ['./admin-profile.component.css'],
 })
-export class ProfileComponent implements OnInit {
+export class AdminProfileComponent implements OnInit {
   user: any = null;
   isEditMode: boolean = false;
   isChangingPassword: boolean = false;
@@ -20,36 +19,22 @@ export class ProfileComponent implements OnInit {
   errorMessage: string = '';
   successMessage: string = '';
 
-  // User edit form
   editForm = {
     fullName: '',
     email: '',
     phoneNumber: 0,
   };
 
-  // Password change form
   passwordForm = {
     oldPassword: '',
     newPassword: '',
     confirmPassword: '',
   };
 
-  // Statistics
-  stats = {
-    totalBookings: 0,
-    upcomingBookings: 0,
-    completedBookings: 0,
-  };
-
-  constructor(
-    private userService: UserService,
-    private bookingService: BookingService,
-    private router: Router
-  ) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadUserProfile();
-    this.loadUserStatistics();
   }
 
   loadUserProfile(): void {
@@ -69,33 +54,6 @@ export class ProfileComponent implements OnInit {
     this.isLoading = false;
   }
 
-  loadUserStatistics(): void {
-    const userDetailsStr = localStorage.getItem('userDetails');
-    if (!userDetailsStr) return;
-
-    const userDetails = JSON.parse(userDetailsStr);
-
-    this.bookingService.getBookingsByUser(userDetails.userId).subscribe({
-      next: (bookings) => {
-        this.stats.totalBookings = bookings.length;
-
-        const today = new Date();
-        this.stats.upcomingBookings = bookings.filter(
-          (b: any) =>
-            (b.status === 'CONFIRMED' || b.status === 'PENDING') &&
-            new Date(b.checkInDate) >= today
-        ).length;
-
-        this.stats.completedBookings = bookings.filter(
-          (b: any) => b.status === 'COMPLETED'
-        ).length;
-      },
-      error: (error) => {
-        console.error('Error loading statistics:', error);
-      },
-    });
-  }
-
   enableEditMode(): void {
     this.isEditMode = true;
     this.errorMessage = '';
@@ -104,7 +62,7 @@ export class ProfileComponent implements OnInit {
 
   cancelEdit(): void {
     this.isEditMode = false;
-    this.loadUserProfile(); // Reset form
+    this.loadUserProfile();
     this.errorMessage = '';
   }
 
@@ -117,18 +75,16 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    // Include role from localStorage
     const updateData = {
       userId: this.user.userId,
       fullName: this.editForm.fullName,
       email: this.editForm.email,
       phoneNumber: this.editForm.phoneNumber,
-      role: this.user.role, // ← ADD ROLE FROM LOCALSTORAGE
+      role: this.user.role,
     };
 
     this.userService.updateUser(updateData).subscribe({
       next: (response) => {
-        // Update localStorage
         const updatedUser = { ...this.user, ...updateData };
         localStorage.setItem('userDetails', JSON.stringify(updatedUser));
 
@@ -183,7 +139,7 @@ export class ProfileComponent implements OnInit {
       userId: this.user.userId,
       oldPassword: this.passwordForm.oldPassword,
       newPassword: this.passwordForm.newPassword,
-      confirmNewPassword: this.passwordForm.confirmPassword, // ← ADD THIS
+      confirmNewPassword: this.passwordForm.confirmPassword,
     };
 
     this.userService.changePassword(passwordData).subscribe({
@@ -205,17 +161,14 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  goToMyBookings(): void {
-    this.router.navigate(['/my-bookings']);
+  get passwordsMatch(): boolean {
+    if (!this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
+      return true;
+    }
+    return this.passwordForm.newPassword === this.passwordForm.confirmPassword;
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
-  }
-  get passwordsMatch(): boolean {
-    if (!this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
-      return true; // Don't show error if fields are empty
-    }
-    return this.passwordForm.newPassword === this.passwordForm.confirmPassword;
+    this.router.navigate(['/admin-dashboard']);
   }
 }

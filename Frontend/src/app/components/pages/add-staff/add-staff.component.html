@@ -1,0 +1,180 @@
+<div class="add-staff-container">
+  <div class="add-staff-content">
+    <!-- Header -->
+    <div class="staff-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>Add New Staff Member</h1>
+      <p class="subtitle">Create a new staff account for your team</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Add Staff Form -->
+    <div class="form-card">
+      <form (ngSubmit)="addStaff()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fullName">Full Name *</label>
+            <input
+              type="text"
+              id="fullName"
+              [(ngModel)]="staffForm.fullName"
+              name="fullName"
+              class="form-input"
+              placeholder="Enter staff member's full name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="staffForm.email"
+              name="email"
+              class="form-input"
+              placeholder="staff@elitehaven.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hotelId">Assign to Hotel *</label>
+            <select
+              id="hotelId"
+              [(ngModel)]="staffForm.hotelId"
+              name="hotelId"
+              class="form-input"
+              required
+            >
+              <option value="0" disabled>Select a hotel</option>
+              <option *ngFor="let hotel of hotels" [value]="hotel.hotelId">
+                {{ hotel.hotelName }} - {{ hotel.location }}
+              </option>
+            </select>
+            <small class="input-hint" *ngIf="isLoadingHotels"
+              >Loading hotels...</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input
+              type="number"
+              id="phone"
+              [(ngModel)]="staffForm.phone"
+              name="phone"
+              class="form-input"
+              placeholder="Enter phone number"
+            />
+          </div>
+        </div>
+
+        <!-- Rest of the password fields stay the same -->
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input
+              type="password"
+              id="password"
+              [(ngModel)]="staffForm.password"
+              name="password"
+              class="form-input"
+              [class.input-error]="
+                staffForm.password && staffForm.password.length < 8
+              "
+              placeholder="Minimum 8 characters"
+              required
+            />
+            <small
+              class="input-hint error"
+              *ngIf="staffForm.password && staffForm.password.length < 8"
+            >
+              ⚠ Password must be at least 8 characters
+            </small>
+            <small
+              class="input-hint success"
+              *ngIf="staffForm.password && staffForm.password.length >= 8"
+            >
+              ✓ Password length is valid
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password *</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              [(ngModel)]="staffForm.confirmPassword"
+              name="confirmPassword"
+              class="form-input"
+              [class.input-error]="!passwordsMatch && staffForm.confirmPassword"
+              [class.input-success]="
+                passwordsMatch &&
+                staffForm.confirmPassword &&
+                staffForm.password
+              "
+              placeholder="Re-enter password"
+              required
+            />
+            <small
+              class="input-hint error"
+              *ngIf="!passwordsMatch && staffForm.confirmPassword"
+            >
+              ⚠ Passwords do not match
+            </small>
+            <small
+              class="input-hint success"
+              *ngIf="
+                passwordsMatch &&
+                staffForm.confirmPassword &&
+                staffForm.password
+              "
+            >
+              ✓ Passwords match
+            </small>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-icon">ℹ️</span>
+          <div class="info-text">
+            <strong>Staff Account Details:</strong>
+            <p>
+              Notify the staff member to change the default password set by
+              Admin.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="
+              isLoading || !passwordsMatch || staffForm.password.length < 8
+            "
+          >
+            <span *ngIf="!isLoading">➕ Add Staff Member</span>
+            <span *ngIf="isLoading">
+              <span class="spinner"></span> Adding...
+            </span>
+          </button>
+          <button type="button" class="btn-cancel" (click)="goBack()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

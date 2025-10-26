@@ -10,6 +10,8 @@ import { PaymentFormComponent } from './components/pages/payment-form/payment-fo
 import { ProfileComponent } from './components/pages/profile/profile.component';
 import { MyBookingsComponent } from './components/pages/my-bookings/my-bookings.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
+import { AdminProfileComponent } from './components/pages/admin-profile/admin-profile.component';
+import { AddStaffComponent } from './components/pages/add-staff/add-staff.component';
 
 export const routes: Routes = [
   // Public routes
@@ -56,6 +58,17 @@ export const routes: Routes = [
   {
     path: 'payment',
     component: PaymentFormComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin/profile',
+    component: AdminProfileComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/add-staff',
+    component: AddStaffComponent,
     canActivate: [authGuard],
   },
 

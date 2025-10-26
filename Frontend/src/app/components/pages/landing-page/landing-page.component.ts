@@ -12,7 +12,7 @@ import { debounceTime, Subject, forkJoin } from 'rxjs';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.css'],
 })
@@ -302,10 +302,10 @@ export class LandingPageComponent implements OnInit {
         room: room,
         checkIn: this.checkInDate,
         checkOut: this.checkOutDate,
-        returnUrl: '/booking'
+        returnUrl: '/booking',
       };
       localStorage.setItem('bookingIntent', JSON.stringify(bookingIntent));
-      
+
       alert('Please sign in to book a room');
       this.router.navigate(['/signin']);
       return;
