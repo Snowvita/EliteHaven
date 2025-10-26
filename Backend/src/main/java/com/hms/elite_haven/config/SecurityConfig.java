@@ -38,7 +38,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/api/v1/auth/**","/api/v1/register_user/**","/api/v1/existing_hotels/**","/api/v1/get_hotel/**","/api/v1/get_hotel_name/**",
+                "/api/v1/get_room/**",
+                "/api/v1/all_rooms/**",
+                "/api/v1/room_hotel/**",
+                "/api/v1/available/**",
+                "/api/v1/room_photos/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

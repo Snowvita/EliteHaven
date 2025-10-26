@@ -12,8 +12,11 @@ import com.hms.elite_haven.dao.BookingDao;
 import com.hms.elite_haven.dao.PaymentDao;
 import com.hms.elite_haven.dao.entity.BookingEntity;
 import com.hms.elite_haven.dao.entity.PaymentEntity;
+import com.hms.elite_haven.dto.PaymentRequestDto;
 import com.hms.elite_haven.utils.BookingStatus;
 import com.hms.elite_haven.utils.PaymentStatus;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PaymentService {
@@ -23,6 +26,33 @@ public class PaymentService {
 
     @Autowired
     private BookingDao bookingDao;
+
+    @Transactional
+    public PaymentEntity processPayment(PaymentRequestDto paymentDto) {
+        // Fetch the booking
+        BookingEntity booking = bookingDao.findById(paymentDto.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + paymentDto.getBookingId()));
+        
+        // Create payment entity
+        PaymentEntity payment = new PaymentEntity();
+        payment.setBooking(booking);
+        payment.setAmount(paymentDto.getAmount());
+        payment.setPaymentMethod(paymentDto.getPaymentMethod());
+        payment.setPaymentStatus(PaymentStatus.SUCCESS);
+        payment.setTransactionId("TXN" + System.currentTimeMillis()); // Mock transaction ID
+        
+        // Save payment
+        PaymentEntity savedPayment = paymentDao.save(payment);
+        
+        // Update booking status to CONFIRMED
+        if (booking.getStatus() == BookingStatus.PENDING) {
+            booking.setStatus(BookingStatus.CONFIRMED);
+            bookingDao.save(booking);
+        }
+        
+        return savedPayment;
+    }
+
 
     // Pay booking (marks booking as CONFIRMED)
     public PaymentEntity payBooking(PaymentEntity payment) {

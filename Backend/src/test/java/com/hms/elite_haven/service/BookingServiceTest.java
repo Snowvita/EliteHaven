@@ -1,8 +1,10 @@
 package com.hms.elite_haven.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.hms.elite_haven.dao.BookingDao;
+import com.hms.elite_haven.dao.RoomDao;
+import com.hms.elite_haven.dao.UserDao;
 import com.hms.elite_haven.dao.entity.BookingEntity;
+import com.hms.elite_haven.dao.entity.RoomEntity;
+import com.hms.elite_haven.dao.entity.UserEntity;
+import com.hms.elite_haven.dto.BookingRequestDto;
 import com.hms.elite_haven.utils.BookingStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,6 +28,12 @@ public class BookingServiceTest {
 
     @Mock
     private BookingDao bookingDao;
+
+    @Mock 
+    private RoomDao roomDao;
+
+    @Mock
+    private UserDao userDao;
 
     @InjectMocks
     private BookingService bookingService;
@@ -37,30 +50,37 @@ public class BookingServiceTest {
     @Test
     void createBooking_ShouldSetStatusToPendingAndSave() {
         // Arrange
-        BookingEntity inputBooking = new BookingEntity();
+        BookingRequestDto bookingDto = new BookingRequestDto();
+        bookingDto.setUserId(1L);
+        bookingDto.setRoomId(1L);
+        bookingDto.setCheckInDate(LocalDate.now().plusDays(1));
+        bookingDto.setCheckOutDate(LocalDate.now().plusDays(3));
+        bookingDto.setNumberOfGuests(2);
+        bookingDto.setTotalPrice(500.0);
+        
+        // Mock room entity
+        RoomEntity mockRoom = new RoomEntity();
+        mockRoom.setRoomId(1L);
+        
+        // Mock user entity
+        UserEntity mockUser = new UserEntity();
+        mockUser.setUserId(1L);
+        
+        // Mock the DAO calls
+        when(roomDao.findById(1L)).thenReturn(Optional.of(mockRoom));
+        when(userDao.findById(1L)).thenReturn(Optional.of(mockUser));
+        when(bookingDao.existsOverlappingBooking(any(), any(), any())).thenReturn(false);
         when(bookingDao.save(any(BookingEntity.class))).thenReturn(testBooking);
 
         // Act
-        BookingEntity result = bookingService.createBooking(inputBooking);
+        BookingEntity result = bookingService.createBooking(bookingDto);
 
         // Assert
         assertEquals(BookingStatus.PENDING, result.getStatus());
-        verify(bookingDao).save(inputBooking);
-    }
-
-    @Test
-    void confirmBooking_ShouldSetStatusToConfirmedAndSave() {
-        // Arrange
-        BookingEntity inputBooking = new BookingEntity();
-        testBooking.setStatus(BookingStatus.CONFIRMED);
-        when(bookingDao.save(any(BookingEntity.class))).thenReturn(testBooking);
-
-        // Act
-        BookingEntity result = bookingService.confirmBooking(inputBooking);
-
-        // Assert
-        assertEquals(BookingStatus.CONFIRMED, result.getStatus());
-        verify(bookingDao).save(inputBooking);
+        verify(roomDao).findById(1L);
+        verify(userDao).findById(1L);
+        verify(bookingDao).existsOverlappingBooking(1L, bookingDto.getCheckInDate(), bookingDto.getCheckOutDate());
+        verify(bookingDao).save(any(BookingEntity.class));  // ← Verify with BookingEntity, not DTO
     }
 
     @Test

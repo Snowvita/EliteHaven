@@ -5,6 +5,8 @@ CREATE TABLE bookings (
     booked_by_staff_id BIGINT,
     check_in_date DATE NOT NULL,
     check_out_date DATE NOT NULL,
+    number_of_guests INT NOT NULL,           -- ← ADD THIS
+    total_price DOUBLE NOT NULL,             -- ← ADD THIS
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) DEFAULT 'PENDING',
     
@@ -12,6 +14,7 @@ CREATE TABLE bookings (
     CONSTRAINT fk_booking_room FOREIGN KEY (room_id) REFERENCES rooms(room_id),
     CONSTRAINT fk_booking_staff FOREIGN KEY (booked_by_staff_id) REFERENCES staff(staff_id)
 );
+
 
 CREATE TABLE booking_services (
     booking_id BIGINT NOT NULL,
@@ -35,21 +38,29 @@ CREATE TABLE hotels (
     location VARCHAR(100) NOT NULL,
     contact_number VARCHAR(20),
     description VARCHAR(255),
+    photo_url VARCHAR(500),
     is_deleted INT DEFAULT 0
 );
 
 CREATE TABLE payments (
     payment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    booking_id BIGINT,
-    amount DOUBLE CHECK (amount > 0),
+    booking_id BIGINT NOT NULL,
+    amount DOUBLE NOT NULL CHECK (amount > 0),
     payment_method VARCHAR(50) NOT NULL,
     payment_status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_booking
-        FOREIGN KEY (booking_id)
+    transaction_id VARCHAR(100),
+    is_refunded BOOLEAN DEFAULT FALSE,
+    refund_amount DOUBLE DEFAULT 0.0,
+    refund_date TIMESTAMP NULL,
+    is_deleted INT DEFAULT 0,
+    
+    CONSTRAINT fk_payment_booking 
+        FOREIGN KEY (booking_id) 
         REFERENCES bookings(booking_id)
         ON DELETE CASCADE
 );
+
 
 CREATE TABLE reviews (
     review_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -93,7 +104,6 @@ CREATE TABLE rooms (
     room_number VARCHAR(20) NOT NULL,
     type VARCHAR(20) NOT NULL,
     price_per_night DOUBLE NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE',
     is_deleted TINYINT DEFAULT 0,
     CONSTRAINT fk_hotel
         FOREIGN KEY (hotel_id)

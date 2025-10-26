@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.hms.elite_haven.dao.entity.PaymentEntity;
+import com.hms.elite_haven.dto.PaymentRequestDto;
 import com.hms.elite_haven.service.PaymentService;
 
 import jakarta.validation.Valid;
@@ -22,9 +23,13 @@ public class PaymentController {
 
     // Pay booking (creates a payment and marks booking as CONFIRMED if pending)
     @PostMapping("/pay")
-    public ResponseEntity<PaymentEntity> payBooking(@RequestBody @Valid PaymentEntity payment) {
-        PaymentEntity savedPayment = paymentService.payBooking(payment);
-        return ResponseEntity.ok(savedPayment);
+    public ResponseEntity<PaymentEntity> processPayment(@RequestBody PaymentRequestDto paymentDto) {
+        try {
+            PaymentEntity payment = paymentService.processPayment(paymentDto);
+            return ResponseEntity.ok(payment);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Get all payments

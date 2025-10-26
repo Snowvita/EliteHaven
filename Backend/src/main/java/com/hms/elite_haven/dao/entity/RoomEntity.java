@@ -1,6 +1,5 @@
 package com.hms.elite_haven.dao.entity;
 
-import com.hms.elite_haven.utils.RoomStatus;
 import com.hms.elite_haven.utils.RoomType;
 
 import jakarta.persistence.Column;
@@ -14,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -51,10 +49,10 @@ public class RoomEntity {
     @Column(name = "price_per_night")
     private Double pricePerNight;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private RoomStatus status = RoomStatus.AVAILABLE;
+    // @NotNull
+    // @Enumerated(EnumType.STRING)
+    // @Column(name = "status")
+    // private RoomStatus status = RoomStatus.AVAILABLE;
     
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;

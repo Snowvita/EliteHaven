@@ -1,0 +1,12 @@
+/* Global app styles */
+/* Remove any default spacing */
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+}

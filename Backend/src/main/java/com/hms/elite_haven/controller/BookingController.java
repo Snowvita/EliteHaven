@@ -3,10 +3,12 @@ package com.hms.elite_haven.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.hms.elite_haven.dao.entity.BookingEntity;
+import com.hms.elite_haven.dto.BookingRequestDto;
 import com.hms.elite_haven.service.BookingService;
 
 import jakarta.validation.Valid;
@@ -19,17 +21,17 @@ public class BookingController {
     private BookingService bookingService;
 
     // Create a new booking (without payment)
-    @PostMapping("/create_booking")
-    public ResponseEntity<BookingEntity> createBooking(@RequestBody @Valid BookingEntity booking) {
-        BookingEntity savedBooking = bookingService.createBooking(booking);
-        return ResponseEntity.ok(savedBooking);
-    }
+@PostMapping("/create_booking")
+public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody BookingRequestDto bookingDto) {
+    BookingEntity createdBooking = bookingService.createBooking(bookingDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
+}
+
 
     // Confirm booking (after payment)
     @PutMapping("/confirm_booking/{bookingId}")
     public ResponseEntity<BookingEntity> confirmBooking(@PathVariable Long bookingId) {
-        BookingEntity booking = bookingService.getBookingById(bookingId);
-        BookingEntity confirmedBooking = bookingService.confirmBooking(booking);
+        BookingEntity confirmedBooking = bookingService.confirmBooking(bookingId);
         return ResponseEntity.ok(confirmedBooking);
     }
 

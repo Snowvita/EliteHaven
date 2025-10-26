@@ -1,0 +1,250 @@
+<div class="landing-container">
+  <!-- Hero Section with Search -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Find Your Perfect Stay</h1>
+      <p class="hero-subtitle">
+        Discover amazing hotels and book your dream vacation
+      </p>
+
+      <!-- Search Form -->
+      <div class="search-card">
+        <div class="search-form">
+          <div class="form-group">
+            <label for="checkIn"> <span class="icon">📅</span> Check-in </label>
+            <input
+              type="text"
+              id="checkIn"
+              [value]="getFormattedCheckIn()"
+              readonly
+              (click)="openCalendar('checkIn')"
+              class="date-input"
+              placeholder="Select date"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="checkOut">
+              <span class="icon">📅</span> Check-out
+            </label>
+            <input
+              type="text"
+              id="checkOut"
+              [value]="getFormattedCheckOut()"
+              readonly
+              (click)="openCalendar('checkOut')"
+              class="date-input"
+              placeholder="Select date"
+            />
+          </div>
+
+          <button class="btn-search" (click)="searchAvailableRooms()">
+            <span class="icon">🔍</span> Search Rooms
+          </button>
+        </div>
+
+        <!-- Date range info -->
+        <div class="date-info" *ngIf="checkInDate && checkOutDate">
+          <span>{{ calculateNights() }} nights</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calendar Modal -->
+  <div class="calendar-overlay" *ngIf="showCalendar" (click)="closeCalendar()">
+    <div class="calendar-modal" (click)="$event.stopPropagation()">
+      <div class="calendar-header">
+        <button class="calendar-nav" (click)="previousMonth()">‹</button>
+        <h3>{{ getMonthYear() }}</h3>
+        <button class="calendar-nav" (click)="nextMonth()">›</button>
+      </div>
+
+      <div class="calendar-weekdays">
+        <div class="weekday">Sun</div>
+        <div class="weekday">Mon</div>
+        <div class="weekday">Tue</div>
+        <div class="weekday">Wed</div>
+        <div class="weekday">Thu</div>
+        <div class="weekday">Fri</div>
+        <div class="weekday">Sat</div>
+      </div>
+
+      <div class="calendar-days">
+        <div
+          *ngFor="let dayObj of calendarDays"
+          class="calendar-day"
+          [class.disabled]="dayObj.disabled"
+          [class.selected]="dayObj.selected"
+          [class.check-in]="dayObj.isCheckIn"
+          [class.check-out]="dayObj.isCheckOut"
+          [class.between]="dayObj.isBetween"
+          (click)="selectDate(dayObj)"
+        >
+          {{ dayObj.day }}
+        </div>
+      </div>
+
+      <div class="calendar-footer">
+        <button class="btn-cancel" (click)="closeCalendar()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <section class="results-section">
+    <div class="container">
+      <!-- Search Results Header with Filters -->
+      <div class="section-header" *ngIf="searchPerformed">
+        <div>
+          <h2>Available Rooms</h2>
+          <p>
+            {{ filteredRooms.length }} rooms found for
+            {{ calculateNights() }} nights
+          </p>
+        </div>
+
+        <div class="filter-controls">
+          <div class="room-type-filters">
+            <button
+              class="filter-btn"
+              [class.active]="roomTypeFilter === 'ALL'"
+              (click)="filterByRoomType('ALL')"
+            >
+              All
+            </button>
+            <button
+              class="filter-btn"
+              [class.active]="roomTypeFilter === 'SINGLE'"
+              (click)="filterByRoomType('SINGLE')"
+            >
+              Single
+            </button>
+            <button
+              class="filter-btn"
+              [class.active]="roomTypeFilter === 'DOUBLE'"
+              (click)="filterByRoomType('DOUBLE')"
+            >
+              Double
+            </button>
+            <button
+              class="filter-btn"
+              [class.active]="roomTypeFilter === 'SUITE'"
+              (click)="filterByRoomType('SUITE')"
+            >
+              Suite
+            </button>
+          </div>
+          <button class="btn-clear" (click)="clearSearch()">
+            Clear Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Hotels/Featured Section -->
+      <div class="section-header" *ngIf="!searchPerformed">
+        <div>
+          <h2>Featured Hotels</h2>
+          <p>Explore our handpicked selection of luxury accommodations</p>
+        </div>
+
+        <!-- Search bar for hotels -->
+        <div class="search-bar">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Search by hotel name or location..."
+            class="search-input"
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+
+      <!-- Available Rooms Grid -->
+      <div class="rooms-grid" *ngIf="searchPerformed && !isLoading">
+        <div class="room-card" *ngFor="let room of filteredRooms">
+          <div class="room-image">
+            <img
+              [src]="getPrimaryPhoto(room)"
+              [alt]="getRoomTypeLabel(room.type)"
+            />
+            <span class="room-badge">{{ getRoomTypeLabel(room.type) }}</span>
+          </div>
+          <div class="room-details">
+            <div class="room-header">
+              <h3>{{ room.hotel.hotelName }}</h3>
+              <div class="room-location">
+                <span class="icon">📍</span> {{ room.hotel.location }}
+              </div>
+            </div>
+
+            <div class="room-info-row">
+              <div class="info-item">
+                <span class="icon">🛏️</span> Room {{ room.roomNumber }}
+              </div>
+              <div class="info-item">
+                <span class="icon">💰</span> ₹{{ room.pricePerNight }}/night
+              </div>
+            </div>
+
+            <div class="booking-summary">
+              <div class="summary-row">
+                <span>{{ calculateNights() }} nights</span>
+                <span class="price-highlight"
+                  >₹{{ calculateTotalPrice(room) }}</span
+                >
+              </div>
+            </div>
+
+            <button class="btn-book" (click)="bookRoom(room)">Book Now</button>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="filteredRooms.length === 0">
+          <span class="empty-icon">😔</span>
+          <h3>No Rooms Available</h3>
+          <p>Try adjusting your search dates or room type filter</p>
+        </div>
+      </div>
+
+      <!-- Hotels Grid -->
+      <div class="hotels-grid" *ngIf="!searchPerformed && !isLoading">
+        <div class="hotel-card" *ngFor="let hotel of filteredHotels">
+          <div class="hotel-image" *ngIf="hotel.photoUrl">
+            <img [src]="hotel.photoUrl" [alt]="hotel.hotelName" />
+          </div>
+          <div class="hotel-details">
+            <h3>{{ hotel.hotelName }}</h3>
+            <div class="hotel-location">
+              <span class="icon">📍</span> {{ hotel.location }}
+            </div>
+            <div class="hotel-contact" *ngIf="hotel.contactNumber">
+              <span class="icon">📞</span> {{ hotel.contactNumber }}
+            </div>
+            <p class="hotel-description" *ngIf="hotel.description">
+              {{ hotel.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- No Hotels -->
+        <div class="no-results" *ngIf="filteredHotels.length === 0">
+          <span class="empty-icon">🏨</span>
+          <h3>No Hotels Found</h3>
+          <p *ngIf="searchTerm">
+            No hotels match your search "{{ searchTerm }}"
+          </p>
+          <p *ngIf="!searchTerm">Check back soon for new listings!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

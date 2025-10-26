@@ -1,7 +1,10 @@
 package com.hms.elite_haven.utils;
 
 public enum PaymentMethod {
-    CARD, 
-    UPI, 
-    CASH
+    CREDIT_CARD,
+    DEBIT_CARD,
+    UPI,
+    NET_BANKING,
+    CASH,
+    WALLET
 }

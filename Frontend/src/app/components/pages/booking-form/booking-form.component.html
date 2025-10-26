@@ -1,0 +1,130 @@
+<div class="booking-container">
+  <div class="booking-content">
+    <!-- Header -->
+    <div class="booking-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Search
+      </button>
+      <h1>Complete Your Booking</h1>
+    </div>
+
+    <div class="booking-layout" *ngIf="room">
+      <!-- Left Side - Booking Form -->
+      <div class="booking-form-section">
+        <div class="form-card">
+          <h2>Guest Details</h2>
+
+          <form (ngSubmit)="onSubmit()">
+            <!-- Number of Guests -->
+            <div class="form-group">
+              <label for="guests">
+                <span class="icon">👥</span> Number of Guests
+              </label>
+              <input
+                type="number"
+                id="guests"
+                [(ngModel)]="guests"
+                name="guests"
+                [min]="1"
+                [max]="maxGuests"
+                class="form-input"
+                required
+              />
+              <small class="helper-text"
+                >Maximum {{ maxGuests }} guests for
+                {{ getRoomTypeLabel(room.type) }}</small
+              >
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" *ngIf="errorMessage">
+              {{ errorMessage }}
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" [disabled]="isLoading">
+              <span *ngIf="!isLoading"
+                >Confirm Booking - ₹{{ calculateTotalPrice() }}</span
+              >
+              <span *ngIf="isLoading">Processing...</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Policies moved here -->
+        <div class="policies-card">
+          <h3>Booking Policies</h3>
+          <ul class="policy-list">
+            <li>✓ Free cancellation up to 24 hours before check-in</li>
+            <li>✓ Valid ID proof required at check-in</li>
+            <li>✓ Check-in time: 2:00 PM</li>
+            <li>✓ Check-out time: 11:00 AM</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Side - Booking Summary -->
+      <div class="booking-summary-section">
+        <div class="summary-card">
+          <h2>Booking Summary</h2>
+
+          <!-- Room Details -->
+          <div class="summary-section">
+            <h3>Room Details</h3>
+            <div class="detail-row">
+              <span class="label">Hotel:</span>
+              <span class="value">{{ room.hotel.hotelName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Location:</span>
+              <span class="value">{{ room.hotel.location }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Room Type:</span>
+              <span class="value">{{ getRoomTypeLabel(room.type) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Room Number:</span>
+              <span class="value">{{ room.roomNumber }}</span>
+            </div>
+          </div>
+
+          <!-- Date Details -->
+          <div class="summary-section">
+            <h3>Stay Duration</h3>
+            <div class="detail-row">
+              <span class="label">Check-in:</span>
+              <span class="value">{{ formatDate(checkInDate) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Check-out:</span>
+              <span class="value">{{ formatDate(checkOutDate) }}</span>
+            </div>
+            <div class="detail-row highlight">
+              <span class="label">Total Nights:</span>
+              <span class="value">{{ calculateNights() }} nights</span>
+            </div>
+          </div>
+
+          <!-- Price Breakdown -->
+          <div class="summary-section">
+            <h3>Price Details</h3>
+            <div class="detail-row">
+              <span class="label"
+                >₹{{ room.pricePerNight }} ×
+                {{ calculateNights() }} nights</span
+              >
+              <span class="value">₹{{ calculateTotalPrice() }}</span>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="summary-total">
+            <span class="total-label">Total Amount</span>
+            <span class="total-amount">₹{{ calculateTotalPrice() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

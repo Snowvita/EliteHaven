@@ -1,11 +1,20 @@
 package com.hms.elite_haven.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.hms.elite_haven.dao.entity.RoomEntity;
 import com.hms.elite_haven.service.RoomService;
@@ -34,7 +43,7 @@ public class RoomController {
     }
 
     // Get room by ID
-    @GetMapping("/{roomId}")
+    @GetMapping("/get_room/{roomId}")
     public ResponseEntity<RoomEntity> getRoomById(@PathVariable Long roomId) {
         Optional<RoomEntity> room = roomService.getRoomById(roomId);
         return room.map(ResponseEntity::ok)
@@ -55,19 +64,27 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
-    // Get all available rooms (excluding deleted)
-    @GetMapping("/available_rooms")
-    public ResponseEntity<List<RoomEntity>> getAvailableRooms() {
-        List<RoomEntity> rooms = roomService.getAvailableRooms();
-        return ResponseEntity.ok(rooms);
+
+    @GetMapping("/available")
+    public List<RoomEntity> getAvailableRooms(
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut) {
+        return roomService.getAvailableRooms(checkIn, checkOut);
     }
 
-    // Get available rooms by hotel (excluding deleted)
-    @GetMapping("/available/hotel/{hotelId}")
-    public ResponseEntity<List<RoomEntity>> getAvailableRoomsByHotel(@PathVariable Long hotelId) {
-        List<RoomEntity> rooms = roomService.getAvailableRoomsByHotel(hotelId);
-        return ResponseEntity.ok(rooms);
-    }
+    // Get all available rooms (excluding deleted)
+    // @GetMapping("/available_rooms")
+    // public ResponseEntity<List<RoomEntity>> getAvailableRooms() {
+    //     List<RoomEntity> rooms = roomService.getAvailableRooms();
+    //     return ResponseEntity.ok(rooms);
+    // }
+
+    // // Get available rooms by hotel (excluding deleted)
+    // @GetMapping("/available/hotel/{hotelId}")
+    // public ResponseEntity<List<RoomEntity>> getAvailableRoomsByHotel(@PathVariable Long hotelId) {
+    //     List<RoomEntity> rooms = roomService.getAvailableRoomsByHotel(hotelId);
+    //     return ResponseEntity.ok(rooms);
+    // }
 
     // Soft delete room
     @DeleteMapping("/soft_delete/{roomId}")

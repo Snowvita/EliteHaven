@@ -1,0 +1,277 @@
+<div class="profile-container">
+  <div class="profile-content">
+    <!-- Header -->
+    <div class="profile-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Home
+      </button>
+      <h1>My Profile</h1>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-layout" *ngIf="!isLoading">
+      <!-- Left Side - Stats & Quick Actions -->
+      <aside class="profile-sidebar">
+        <!-- User Info Card -->
+        <div class="user-info-card">
+          <div class="user-avatar">
+            {{ user?.fullName?.charAt(0).toUpperCase() }}
+          </div>
+          <h2>{{ user?.fullName }}</h2>
+          <p class="user-email">{{ user?.email }}</p>
+          <span class="user-role">{{ user?.role }}</span>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="stats-card">
+          <h3>Booking Statistics</h3>
+          <div class="stat-item">
+            <span class="stat-label">Total Bookings</span>
+            <span class="stat-value">{{ stats.totalBookings }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Upcoming</span>
+            <span class="stat-value">{{ stats.upcomingBookings }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Completed</span>
+            <span class="stat-value">{{ stats.completedBookings }}</span>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <button class="btn-bookings" (click)="goToMyBookings()">
+          📋 View My Bookings
+        </button>
+      </aside>
+
+      <!-- Right Side - Profile Details & Edit -->
+      <main class="profile-main">
+        <!-- Success/Error Messages -->
+        <div class="success-message" *ngIf="successMessage">
+          ✓ {{ successMessage }}
+        </div>
+        <div class="error-message" *ngIf="errorMessage">
+          ⚠ {{ errorMessage }}
+        </div>
+
+        <!-- Profile Details Card -->
+        <div class="details-card">
+          <div class="card-header">
+            <h2>Profile Details</h2>
+            <button
+              class="btn-edit"
+              *ngIf="!isEditMode"
+              (click)="enableEditMode()"
+            >
+              ✏️ Edit Profile
+            </button>
+          </div>
+
+          <!-- View Mode -->
+          <div class="details-view" *ngIf="!isEditMode">
+            <div class="detail-row">
+              <span class="label">Full Name</span>
+              <span class="value">{{ user?.fullName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Email</span>
+              <span class="value">{{ user?.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Phone Number</span>
+              <span class="value">{{
+                user?.phoneNumber || "Not provided"
+              }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Role</span>
+              <span class="value">{{ user?.role }}</span>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <form
+            class="details-form"
+            *ngIf="isEditMode"
+            (ngSubmit)="saveProfile()"
+          >
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input
+                type="text"
+                id="fullName"
+                [(ngModel)]="editForm.fullName"
+                name="fullName"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                [(ngModel)]="editForm.email"
+                name="email"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input
+                type="number"
+                id="phoneNumber"
+                [(ngModel)]="editForm.phoneNumber"
+                name="phoneNumber"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-save">Save Changes</button>
+              <button type="button" class="btn-cancel" (click)="cancelEdit()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Password Change Card -->
+        <div class="password-card">
+          <div class="card-header">
+            <h2>Password & Security</h2>
+            <button
+              class="btn-change-password"
+              *ngIf="!isChangingPassword"
+              (click)="togglePasswordChange()"
+            >
+              🔒 Change Password
+            </button>
+          </div>
+
+          <!-- Password Change Form -->
+          <form
+            class="password-form"
+            *ngIf="isChangingPassword"
+            (ngSubmit)="changePassword()"
+          >
+            <div class="form-group">
+              <label for="oldPassword">Current Password</label>
+              <input
+                type="password"
+                id="oldPassword"
+                [(ngModel)]="passwordForm.oldPassword"
+                name="oldPassword"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input
+                type="password"
+                id="newPassword"
+                [(ngModel)]="passwordForm.newPassword"
+                name="newPassword"
+                class="form-input"
+                [class.input-error]="
+                  passwordForm.newPassword &&
+                  passwordForm.newPassword.length < 8
+                "
+                required
+              />
+              <small
+                class="input-hint error"
+                *ngIf="
+                  passwordForm.newPassword &&
+                  passwordForm.newPassword.length < 8
+                "
+              >
+                ⚠ Password must be at least 8 characters
+              </small>
+              <small
+                class="input-hint success"
+                *ngIf="
+                  passwordForm.newPassword &&
+                  passwordForm.newPassword.length >= 8
+                "
+              >
+                ✓ Password length is valid
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                [(ngModel)]="passwordForm.confirmPassword"
+                name="confirmPassword"
+                class="form-input"
+                [class.input-error]="
+                  !passwordsMatch && passwordForm.confirmPassword
+                "
+                [class.input-success]="
+                  passwordsMatch &&
+                  passwordForm.confirmPassword &&
+                  passwordForm.newPassword
+                "
+                required
+              />
+              <small
+                class="input-hint error"
+                *ngIf="!passwordsMatch && passwordForm.confirmPassword"
+              >
+                ⚠ Passwords do not match
+              </small>
+              <small
+                class="input-hint success"
+                *ngIf="
+                  passwordsMatch &&
+                  passwordForm.confirmPassword &&
+                  passwordForm.newPassword
+                "
+              >
+                ✓ Passwords match
+              </small>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn-save"
+                [disabled]="
+                  !passwordsMatch || passwordForm.newPassword.length < 8
+                "
+              >
+                Update Password
+              </button>
+              <button
+                type="button"
+                class="btn-cancel"
+                (click)="togglePasswordChange()"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+
+          <p class="password-hint" *ngIf="!isChangingPassword">
+            Last changed: Never (or we don't track this 😊)
+          </p>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

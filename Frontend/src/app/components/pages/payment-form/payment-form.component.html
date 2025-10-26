@@ -1,0 +1,85 @@
+<div class="payment-container">
+  <div class="payment-content">
+    <!-- Success Screen -->
+    <div class="success-screen" *ngIf="paymentSuccess">
+      <div class="success-icon">✓</div>
+      <h1>Payment Successful!</h1>
+      <p>Your booking has been confirmed.</p>
+      <p class="redirect-message">Redirecting to My Bookings...</p>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="payment-form-wrapper" *ngIf="!paymentSuccess">
+      <div class="payment-header">
+        <button class="btn-back" (click)="goBack()">
+          <span class="icon">←</span> Back
+        </button>
+        <h1>Complete Payment</h1>
+      </div>
+
+      <div class="payment-layout">
+        <!-- Payment Summary Card -->
+        <div class="payment-summary-card">
+          <h2>Payment Summary</h2>
+          <div class="summary-row">
+            <span class="label">Booking ID:</span>
+            <span class="value">#{{ bookingId }}</span>
+          </div>
+          <div class="summary-total">
+            <span class="total-label">Amount to Pay</span>
+            <span class="total-amount">₹{{ amount }}</span>
+          </div>
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="payment-method-card">
+          <h2>Select Payment Method</h2>
+          <div class="payment-methods">
+            <label
+              *ngFor="let method of paymentMethods"
+              class="payment-method-option"
+              [class.selected]="selectedPaymentMethod === method.value"
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                [value]="method.value"
+                [(ngModel)]="selectedPaymentMethod"
+              />
+              <div class="method-content">
+                <span class="method-icon">{{ method.icon }}</span>
+                <span class="method-label">{{ method.label }}</span>
+              </div>
+              <span
+                class="checkmark"
+                *ngIf="selectedPaymentMethod === method.value"
+                >✓</span
+              >
+            </label>
+          </div>
+
+          <!-- Error Message -->
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Pay Button -->
+          <button
+            class="btn-pay"
+            (click)="processPayment()"
+            [disabled]="isProcessing"
+          >
+            <span *ngIf="!isProcessing">Pay ₹{{ amount }}</span>
+            <span *ngIf="isProcessing">
+              <span class="spinner"></span> Processing...
+            </span>
+          </button>
+
+          <p class="secure-note">
+            🔒 This is a demo payment. No actual transaction will be processed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

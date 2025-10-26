@@ -1,0 +1,187 @@
+<div class="bookings-container">
+  <div class="bookings-content">
+    <!-- Header -->
+    <div class="bookings-header">
+      <button class="btn-back" (click)="goToHome()">
+        <span class="icon">←</span> Back to Home
+      </button>
+      <h1>My Bookings</h1>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading your bookings...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="errorMessage && !isLoading">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Bookings Content -->
+    <div class="bookings-sections" *ngIf="!isLoading && !errorMessage">
+      <!-- Upcoming Bookings -->
+      <section class="booking-section" *ngIf="upcomingBookings.length > 0">
+        <h2>Upcoming Bookings</h2>
+        <div class="bookings-grid">
+          <div class="booking-card" *ngFor="let booking of upcomingBookings">
+            <div class="booking-header-card">
+              <span class="booking-id">Booking #{{ booking.bookingId }}</span>
+              <span
+                class="booking-status"
+                [ngClass]="getStatusClass(booking.status)"
+              >
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-row">
+                <span class="label">🏨 Hotel:</span>
+                <span class="value">{{ booking.room.hotel.hotelName }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">📍 Location:</span>
+                <span class="value">{{ booking.room.hotel.location }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">🛏️ Room:</span>
+                <span class="value"
+                  >{{ booking.room.roomNumber }} - {{ booking.room.type }}</span
+                >
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-in:</span>
+                <span class="value">{{ formatDate(booking.checkInDate) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-out:</span>
+                <span class="value">{{
+                  formatDate(booking.checkOutDate)
+                }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">👥 Guests:</span>
+                <span class="value">{{ booking.numberOfGuests }}</span>
+              </div>
+              <div class="detail-row total-price">
+                <span class="label">💰 Total:</span>
+                <span class="value">₹{{ booking.totalPrice }}</span>
+              </div>
+            </div>
+
+            <div class="booking-actions">
+              <button
+                class="btn-cancel"
+                *ngIf="canCancelBooking(booking)"
+                (click)="cancelBooking(booking)"
+              >
+                Cancel Booking
+              </button>
+              <span
+                class="no-cancel-msg"
+                *ngIf="
+                  !canCancelBooking(booking) && booking.status === 'CONFIRMED'
+                "
+              >
+                Cannot cancel within 24 hours of check-in
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Past Bookings -->
+      <section class="booking-section" *ngIf="pastBookings.length > 0">
+        <h2>Past Bookings</h2>
+        <div class="bookings-grid">
+          <div class="booking-card past" *ngFor="let booking of pastBookings">
+            <div class="booking-header-card">
+              <span class="booking-id">Booking #{{ booking.bookingId }}</span>
+              <span
+                class="booking-status"
+                [ngClass]="getStatusClass(booking.status)"
+              >
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-row">
+                <span class="label">🏨 Hotel:</span>
+                <span class="value">{{ booking.room.hotel.hotelName }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">🛏️ Room:</span>
+                <span class="value"
+                  >{{ booking.room.roomNumber }} - {{ booking.room.type }}</span
+                >
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-in:</span>
+                <span class="value">{{ formatDate(booking.checkInDate) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-out:</span>
+                <span class="value">{{
+                  formatDate(booking.checkOutDate)
+                }}</span>
+              </div>
+              <div class="detail-row total-price">
+                <span class="label">💰 Total:</span>
+                <span class="value">₹{{ booking.totalPrice }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cancelled Bookings -->
+      <section class="booking-section" *ngIf="cancelledBookings.length > 0">
+        <h2>Cancelled Bookings</h2>
+        <div class="bookings-grid">
+          <div
+            class="booking-card cancelled"
+            *ngFor="let booking of cancelledBookings"
+          >
+            <div class="booking-header-card">
+              <span class="booking-id">Booking #{{ booking.bookingId }}</span>
+              <span
+                class="booking-status"
+                [ngClass]="getStatusClass(booking.status)"
+              >
+                {{ getStatusLabel(booking.status) }}
+              </span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-row">
+                <span class="label">🏨 Hotel:</span>
+                <span class="value">{{ booking.room.hotel.hotelName }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-in:</span>
+                <span class="value">{{ formatDate(booking.checkInDate) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">📅 Check-out:</span>
+                <span class="value">{{
+                  formatDate(booking.checkOutDate)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="bookings.length === 0">
+        <div class="empty-icon">📭</div>
+        <h3>No Bookings Yet</h3>
+        <p>Start exploring and book your perfect stay!</p>
+        <button class="btn-explore" (click)="goToHome()">Explore Hotels</button>
+      </div>
+    </div>
+  </div>
+</div>

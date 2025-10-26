@@ -1,0 +1,76 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Left: Logo and App Name -->
+    <div class="header-left" (click)="navigateToHome()">
+      <img src="assets/logo.png" alt="EliteHaven Logo" class="logo" />
+      <h1 class="app-name">EliteHaven</h1>
+    </div>
+
+    <!-- Right: Navigation -->
+    <nav class="header-right">
+      <ng-container *ngIf="!isLoggedIn(); else loggedInMenu">
+        <!-- Not Logged In: Show Sign In and Sign Up -->
+        <button routerLink="/signin" class="btn btn-outline">Sign In</button>
+        <button routerLink="/signup" class="btn btn-primary">Sign Up</button>
+      </ng-container>
+
+      <!-- Logged In Menu -->
+      <ng-template #loggedInMenu>
+        <!-- Customer Navigation -->
+        <ng-container *ngIf="getRole() === 'CUSTOMER'">
+          <div class="nav-tabs">
+            <a
+              routerLink="/"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-tab"
+            >
+              <span class="icon">🏠</span> Home
+            </a>
+            <a
+              routerLink="/my-bookings"
+              routerLinkActive="active"
+              class="nav-tab"
+            >
+              <span class="icon">📋</span> My Bookings
+            </a>
+          </div>
+          <div class="profile-dropdown">
+            <button class="btn btn-profile" (click)="toggleProfileMenu()">
+              <span class="profile-icon">👤</span>
+            </button>
+            <div class="dropdown-menu" *ngIf="showProfileMenu">
+              <div class="dropdown-header">
+                <span class="dropdown-name">{{ getUserName() }}</span>
+                <span class="dropdown-email">{{ getUserEmail() }}</span>
+              </div>
+              <hr class="dropdown-divider" />
+              <button
+                class="dropdown-item"
+                routerLink="/profile"
+                (click)="toggleProfileMenu()"
+              >
+                <span class="icon">⚙️</span> Profile Settings
+              </button>
+              <button class="dropdown-item" (click)="logout()">
+                <span class="icon">🚪</span> Logout
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Admin/Staff Navigation -->
+        <ng-container *ngIf="getRole() === 'ADMIN' || getRole() === 'STAFF'">
+          <div class="user-info">
+            <span class="user-name">{{ getUserName() }}</span>
+            <span class="user-role">({{ getRole() }})</span>
+          </div>
+          <button (click)="navigateToDashboard()" class="btn btn-outline">
+            Dashboard
+          </button>
+          <button (click)="logout()" class="btn btn-danger">Logout</button>
+        </ng-container>
+      </ng-template>
+    </nav>
+  </div>
+</header>

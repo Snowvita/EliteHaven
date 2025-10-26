@@ -1,15 +1,18 @@
 package com.hms.elite_haven.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hms.elite_haven.dao.BookingDao;
 import com.hms.elite_haven.dao.HotelDao;
 import com.hms.elite_haven.dao.RoomDao;
 import com.hms.elite_haven.dao.entity.RoomEntity;
-import com.hms.elite_haven.utils.RoomStatus;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class RoomService {
@@ -19,6 +22,20 @@ public class RoomService {
 
     @Autowired
     private HotelDao hotelDao;
+
+    @Autowired
+    private BookingDao bookingDao;
+
+    @Transactional
+    public List<RoomEntity> getAvailableRooms(LocalDate checkIn, LocalDate checkOut) {
+        List<Long> bookedRoomIds = bookingDao.findBookedRoomIdsBetweenDates(checkIn, checkOut);
+
+        if (bookedRoomIds.isEmpty()) {
+            return roomDao.findAll();
+        }
+
+        return roomDao.findByRoomIdNotIn(bookedRoomIds);
+    }
 
     // Add a new room
     public RoomEntity addRoom(RoomEntity room) {
@@ -48,22 +65,6 @@ public class RoomService {
     // Get all rooms for a specific hotel (excluding deleted)
     public List<RoomEntity> getRoomsByHotel(Long hotelId) {
         return roomDao.findByHotel_HotelId(hotelId)
-                      .stream()
-                      .filter(r -> r.getIsDeleted() == 0)
-                      .toList();
-    }
-
-    // Get all rooms for a specific hotel (excluding deleted)
-    public List<RoomEntity> getAvailableRooms() {
-        return roomDao.findByStatus(RoomStatus.AVAILABLE)
-                      .stream()
-                      .filter(r -> r.getIsDeleted() == 0)
-                      .toList();
-    }
-
-    // Get all rooms for a specific hotel (excluding deleted)
-    public List<RoomEntity> getAvailableRoomsByHotel(Long hotelId) {
-        return roomDao.findByStatusAndHotel_HotelId(RoomStatus.AVAILABLE,hotelId)
                       .stream()
                       .filter(r -> r.getIsDeleted() == 0)
                       .toList();

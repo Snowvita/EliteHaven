@@ -1,6 +1,7 @@
 package com.hms.elite_haven.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class UserService {
     }
 
     // Change user password
-    public void changePassword(ChangePasswordDto dto) {
+    public Map<String, String> changePassword(ChangePasswordDto dto) {
         UserEntity user = userDao.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getUserId()));
         if (user.getIsDeleted() == 1) throw new RuntimeException("User is deleted");
@@ -107,7 +108,11 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userDao.save(user);
+        
+        // Return success message
+        return Map.of("message", "Password changed successfully");
     }
+
 
     // Soft delete user
     public void deleteUser(Long userId) {

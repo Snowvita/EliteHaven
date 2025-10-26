@@ -1,10 +1,19 @@
 package com.hms.elite_haven.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.hms.elite_haven.dto.ChangePasswordDto;
 import com.hms.elite_haven.dto.RegisterDto;
@@ -57,10 +66,11 @@ public class UserController {
 
     // Change password
     @PutMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto dto) {
-        userService.changePassword(dto);
-        return ResponseEntity.ok("Password changed successfully");
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody ChangePasswordDto dto) {
+        Map<String, String> response = userService.changePassword(dto);
+        return ResponseEntity.ok(response);
     }
+
 
     // Soft delete user (Admin)
     @DeleteMapping("/delete_user/{userId}")

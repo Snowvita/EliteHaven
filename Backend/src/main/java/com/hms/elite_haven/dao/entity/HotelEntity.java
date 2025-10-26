@@ -42,7 +42,10 @@ public class HotelEntity {
     @Column(name = "description")
     private String description;
 
+    @Size(max = 500)
+    @Column(name = "photo_url")
+    private String photoUrl;  // New field for hotel photo
+
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
-
 }

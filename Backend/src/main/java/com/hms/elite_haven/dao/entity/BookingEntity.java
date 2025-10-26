@@ -1,8 +1,7 @@
 package com.hms.elite_haven.dao.entity;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
+import java.time.LocalDate;
 
 import com.hms.elite_haven.utils.BookingStatus;
 
@@ -14,8 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -49,11 +46,19 @@ public class BookingEntity {
 
     @NotNull
     @Column(name = "check_in_date")
-    private Date checkInDate;
+    private LocalDate checkInDate;
 
     @NotNull
     @Column(name = "check_out_date")
-    private Date checkOutDate;
+    private LocalDate checkOutDate;
+
+    @NotNull
+    @Column(name = "number_of_guests")
+    private Integer numberOfGuests;  // ← ADD THIS
+
+    @NotNull
+    @Column(name = "total_price")
+    private Double totalPrice;  // ← ADD THIS
 
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
@@ -61,12 +66,4 @@ public class BookingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private BookingStatus status = BookingStatus.PENDING;
-
-    @ManyToMany
-    @JoinTable(
-        name = "booking_services",
-        joinColumns = @JoinColumn(name = "booking_id"),
-        inverseJoinColumns = @JoinColumn(name = "service_id")
-    )
-    private List<RoomServiceEntity> services;
 }
