@@ -1,13 +1,6 @@
 -- Elite Haven Database Initialization Script
 
 -- Add unique constraint to prevent duplicate role assignments
-CREATE TABLE IF NOT EXISTS user_roles (
-    user_id BIGINT NOT NULL,
-    role_id BIGINT NOT NULL,
-    PRIMARY KEY (user_id, role_id),
-    UNIQUE KEY unique_user_role (user_id, role_id)
-);
-
 -- 1️⃣ Roles
 INSERT IGNORE INTO roles (role_id, role_name) VALUES
 (1,'CUSTOMER'),

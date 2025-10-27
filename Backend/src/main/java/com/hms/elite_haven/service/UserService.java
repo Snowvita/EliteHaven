@@ -2,6 +2,7 @@ package com.hms.elite_haven.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhoneNumber(dto.getPhone());
-        user.setRoles(List.of(customerRole));
+        user.setRoles(Set.of(customerRole));
         user.setIsDeleted(0);
         userDao.save(user);
 

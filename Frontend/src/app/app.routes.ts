@@ -5,7 +5,6 @@ import { SignupComponent } from './components/pages/signup/signup.component';
 import { AdminDashboardComponent } from './components/pages/admin-dashboard/admin-dashboard.component';
 import { StaffDashboardComponent } from './components/pages/staff-dashboard/staff-dashboard.component';
 import { BookingFormComponent } from './components/pages/booking-form/booking-form.component';
-import { CalendarViewComponent } from './components/pages/calendar-view/calendar-view.component';
 import { PaymentFormComponent } from './components/pages/payment-form/payment-form.component';
 import { ProfileComponent } from './components/pages/profile/profile.component';
 import { MyBookingsComponent } from './components/pages/my-bookings/my-bookings.component';
@@ -61,10 +60,6 @@ export const routes: Routes = [
     path: 'booking',
     component: BookingFormComponent,
     canActivate: [authGuard],
-  },
-  {
-    path: 'calendar',
-    component: CalendarViewComponent,
   },
   {
     path: 'payment',

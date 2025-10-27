@@ -2,6 +2,7 @@ package com.hms.elite_haven.service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +47,7 @@ public class StaffService {
         user.setEmail(staffDto.getEmail());
         user.setPassword(passwordEncoder.encode(staffDto.getPassword()));
         user.setPhoneNumber(staffDto.getPhone());
-        user.setRoles(List.of(staffRole)); // Assign STAFF role
+        user.setRoles(Set.of(staffRole)); // Assign STAFF role
 
         userDao.save(user);
 
