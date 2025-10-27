@@ -105,7 +105,6 @@ export class AddStaffComponent implements OnInit {
 
     this.staffService.createStaff(staffData).subscribe({
       next: (response) => {
-        console.log('Staff added successfully:', response);
         this.successMessage = 'Staff member added successfully!';
         this.isLoading = false;
 

@@ -16,7 +16,6 @@ export class HeaderComponent {
 
   toggleProfileMenu(): void {
     this.showProfileMenu = !this.showProfileMenu;
-    console.log('Profile menu toggled:', this.showProfileMenu); // DEBUG
   }
 
   isLoggedIn(): boolean {

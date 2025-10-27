@@ -45,11 +45,11 @@ INSERT INTO hotels (hotel_id, hotel_name, location, contact_number, description,
 
 -- 5️⃣ Staff
 INSERT INTO staff (staff_id, user_id, hotel_id, full_name, role, contact_number, email, hired_date, is_deleted) VALUES
-(1,2,1,'Bob Reception','Receptionist',8888888888,'bob.staff@elitehaven.com','2025-01-01 09:00:00',0),
-(2,3,1,'Carol Manager','Manager',7777777777,'carol.staff@elitehaven.com','2025-01-02 09:00:00',0),
-(3,4,2,'Dave Housekeeping','Housekeeping',6666666666,'dave.staff@elitehaven.com','2025-01-03 09:00:00',0),
-(4,5,3,'Eve Concierge','Concierge',5555555555,'eve.staff@elitehaven.com','2025-01-04 09:00:00',0),
-(5,6,4,'Frank Reception','Receptionist',4444444444,'frank.staff@elitehaven.com','2025-01-05 09:00:00',0);
+(1,2,1,'Bob','Receptionist',8888888888,'bob.staff@elitehaven.com','2025-01-01 09:00:00',0),
+(2,3,2,'Carol','Manager',7777777777,'carol.staff@elitehaven.com','2025-01-02 09:00:00',0),
+(3,4,3,'Dave','Housekeeping',6666666666,'dave.staff@elitehaven.com','2025-01-03 09:00:00',0),
+(4,5,4,'Eve','Receptionist',5555555555,'eve.staff@elitehaven.com','2025-01-04 09:00:00',0),
+(5,6,5,'Frank','Receptionist',4444444444,'frank.staff@elitehaven.com','2025-01-05 09:00:00',0);
 
 -- 6️⃣ Rooms
 INSERT INTO rooms (room_id, hotel_id, room_number, type, price_per_night, is_deleted) VALUES
@@ -80,15 +80,15 @@ INSERT INTO room_services (service_id, service_name) VALUES
 -- 8️⃣ Bookings
 INSERT INTO bookings (booking_id, user_id, room_id, booked_by_staff_id, check_in_date, check_out_date, number_of_guests, total_price, status, created_at) VALUES
 (1, 7, 1, 1, '2025-11-01', '2025-11-05', 2, 2000.00, 'CONFIRMED', '2025-10-26 10:00:00'),
-(2, 8, 2, 1, '2025-11-02', '2025-11-06', 1, 1500.00, 'PENDING', '2025-10-26 10:05:00'),
+(2, 8, 2, 1, '2025-11-02', '2025-11-06', 1, 1500.00, 'CONFIRMED', '2025-10-26 10:05:00'),
 (3, 9, 3, 2, '2025-11-03', '2025-11-07', 2, 2400.00, 'CANCELLED', '2025-10-26 10:10:00'),
 (4, 10, 4, 3, '2025-11-04', '2025-11-08', 4, 3200.00, 'CONFIRMED', '2025-10-26 10:15:00'),
 (5, 11, 5, 3, '2025-11-05', '2025-11-09', 1, 1600.00, 'CANCELLED', '2025-10-26 10:20:00'),
 (6, 12, 6, 4, '2025-11-06', '2025-11-10', 2, 2000.00, 'CONFIRMED', '2025-10-26 10:25:00'),
-(7, 13, 7, 4, '2025-11-07', '2025-11-11', 2, 2000.00, 'PENDING', '2025-10-26 10:30:00'),
+(7, 13, 7, 4, '2025-11-07', '2025-11-11', 2, 2000.00, 'CONFIRMED', '2025-10-26 10:30:00'),
 (8, 14, 8, 5, '2025-11-08', '2025-11-12', 1, 1600.00, 'CANCELLED', '2025-10-26 10:35:00'),
 (9, 15, 9, 5, '2025-11-09', '2025-11-13', 2, 2000.00, 'CONFIRMED', '2025-10-26 10:40:00'),
-(10, 16, 10, 1, '2025-11-10', '2025-11-14', 1, 2000.00, 'PENDING', '2025-10-26 10:45:00');
+(10, 16, 10, 1, '2025-11-10', '2025-11-14', 1, 2000.00, 'CONFIRMED', '2025-10-26 10:45:00');
 
 -- 9️⃣ Booking Services
 INSERT INTO booking_services (booking_id, service_id) VALUES

@@ -69,17 +69,9 @@ export class UserManagementComponent implements OnInit {
 
     this.userService.getAllUsers().subscribe({
       next: (users) => {
-        console.log('===== ALL USERS FROM BACKEND =====');
-        console.log('Total users:', users.length);
-        console.log('Users:', users);
 
         // Count deleted users
         const deletedCount = users.filter((u) => u.isDeleted === 1).length;
-        console.log('Deleted users count:', deletedCount);
-        console.log(
-          'Deleted users:',
-          users.filter((u) => u.isDeleted === 1)
-        );
 
         this.allUsers = users; // Keep ALL users
         this.loadStaffDetails();

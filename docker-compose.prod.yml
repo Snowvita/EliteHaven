@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: elite-haven-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: elitehaven
+      MYSQL_USER: elitehaven
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-elitehaven123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - elite-haven-network
+
+  backend:
+    image: snowvita/elite-haven-backend:latest
+    container_name: elite-haven-backend
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/elitehaven?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: elitehaven
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-elitehaven123}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
+    networks:
+      - elite-haven-network
+
+  frontend:
+    image: snowvita/elite-haven-frontend:latest
+    container_name: elite-haven-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - elite-haven-network
+
+networks:
+  elite-haven-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

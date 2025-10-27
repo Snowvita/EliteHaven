@@ -52,11 +52,9 @@ export class SigninComponent {
 
         // Check if there's a booking intent
         const bookingIntentStr = localStorage.getItem('bookingIntent');
-        console.log('Booking intent found:', bookingIntentStr); // DEBUG
 
         if (bookingIntentStr && role === 'CUSTOMER') {
           // Navigate to booking page WITHOUT removing bookingIntent
-          console.log('Redirecting to booking page'); // DEBUG
           this.router.navigate(['/booking']);
           this.isLoading = false;
           return;

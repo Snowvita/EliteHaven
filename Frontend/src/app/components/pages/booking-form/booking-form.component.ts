@@ -28,20 +28,15 @@ export class BookingFormComponent implements OnInit {
       this.room = navigation.extras.state['room'];
       this.checkInDate = navigation.extras.state['checkIn'];
       this.checkOutDate = navigation.extras.state['checkOut'];
-      console.log('Got data from navigation state in constructor');
     }
   }
 
   ngOnInit(): void {
-    console.log('BookingForm ngOnInit started');
 
     // If we didn't get data from navigation, check localStorage
     if (!this.room || !this.checkInDate || !this.checkOutDate) {
       const bookingIntentStr = localStorage.getItem('bookingIntent');
-      console.log(
-        'Retrieved bookingIntent from localStorage:',
-        bookingIntentStr
-      );
+
 
       if (bookingIntentStr) {
         try {
@@ -50,7 +45,6 @@ export class BookingFormComponent implements OnInit {
           this.checkInDate = bookingIntent.checkIn;
           this.checkOutDate = bookingIntent.checkOut;
           localStorage.removeItem('bookingIntent');
-          console.log('Got data from localStorage');
         } catch (error) {
           console.error('Error parsing bookingIntent:', error);
         }
@@ -70,7 +64,6 @@ export class BookingFormComponent implements OnInit {
     }
 
     this.maxGuests = this.getMaxGuestsForRoomType(this.room.type);
-    console.log('Booking data loaded successfully');
   }
 
   getMaxGuestsForRoomType(roomType: string): number {
@@ -150,7 +143,6 @@ export class BookingFormComponent implements OnInit {
 
     this.bookingService.createBooking(bookingData).subscribe({
       next: (response) => {
-        console.log('Booking created:', response);
 
         // Store payment intent in localStorage as fallback
         const paymentIntent = {

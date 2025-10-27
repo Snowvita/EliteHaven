@@ -37,8 +37,6 @@ export class BookingManagementComponent implements OnInit {
 
     this.bookingService.getAllBookings().subscribe({
       next: (bookings) => {
-        console.log('✅ Component received bookings:', bookings);
-        console.log('First user phoneNumber:', bookings[0]?.user?.phoneNumber);
 
         this.allBookings = bookings;
         this.applyFilters();

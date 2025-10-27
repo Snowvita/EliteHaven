@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: elite-haven-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: elitehaven
+      MYSQL_USER: elitehaven
+      MYSQL_PASSWORD: elitehaven123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - elite-haven-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./Backend
+    container_name: elite-haven-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/elitehaven?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: elitehaven
+      SPRING_DATASOURCE_PASSWORD: elitehaven123
+      JWT_SECRET: your-jwt-secret-key-min-256-bits
+    ports:
+      - "8080:8080"
+    networks:
+      - elite-haven-network
+
+  frontend:
+    build: ./Frontend
+    container_name: elite-haven-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - elite-haven-network
+
+networks:
+  elite-haven-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
