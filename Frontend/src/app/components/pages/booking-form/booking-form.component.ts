@@ -116,6 +116,12 @@ export class BookingFormComponent implements OnInit {
   onSubmit(): void {
     if (!this.room) return;
 
+    // Check if roomId exists
+    if (!this.room.roomId) {
+      this.errorMessage = 'Invalid room data. Please try again.';
+      return;
+    }
+
     if (this.guests < 1 || this.guests > this.maxGuests) {
       this.errorMessage = `Number of guests must be between 1 and ${this.maxGuests}`;
       return;
@@ -135,7 +141,7 @@ export class BookingFormComponent implements OnInit {
 
     const bookingData = {
       userId: userDetails.userId,
-      roomId: this.room.roomId,
+      roomId: this.room.roomId, // Now TypeScript knows it's not undefined
       checkInDate: this.checkInDate,
       checkOutDate: this.checkOutDate,
       numberOfGuests: this.guests,

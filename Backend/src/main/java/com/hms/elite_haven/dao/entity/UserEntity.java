@@ -55,7 +55,7 @@ public class UserEntity {
     @Min(value = 1000000000L, message = "Phone number must be at least 6000000000")
     @Max(value = 9999999999L, message = "Phone number must be at most 9999999999")
     @Column(name = "phone", unique = true, nullable = false)
-    private Long phone;
+    private Long phoneNumber;
 
 
     @Column(name = "is_deleted")

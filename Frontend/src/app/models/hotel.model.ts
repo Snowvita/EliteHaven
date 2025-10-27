@@ -1,5 +1,5 @@
 export interface HotelModel {
-  hotelId: number;
+  hotelId?: number;
   hotelName: string;
   location: string;
   contactNumber?: string;

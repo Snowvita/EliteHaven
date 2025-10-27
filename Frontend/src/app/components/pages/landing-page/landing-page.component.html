@@ -104,7 +104,47 @@
           </p>
         </div>
 
-        <div class="filter-controls">
+        <button class="btn-clear" (click)="clearSearch()">Clear Search</button>
+      </div>
+
+      <!-- Advanced Filters for Search Results -->
+      <div class="filters-container" *ngIf="searchPerformed">
+        <div class="filter-group">
+          <label>Location</label>
+          <select
+            [(ngModel)]="selectedLocationFilter"
+            (change)="onLocationFilterChange()"
+            class="filter-select"
+          >
+            <option value="ALL">All Locations</option>
+            <option
+              *ngFor="let location of availableLocations"
+              [value]="location"
+            >
+              {{ location }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Hotel</label>
+          <select
+            [(ngModel)]="selectedHotelFilter"
+            (change)="onHotelFilterChange()"
+            class="filter-select"
+          >
+            <option [value]="0">All Hotels</option>
+            <option
+              *ngFor="let hotel of getHotelsForLocation()"
+              [value]="hotel.hotelId"
+            >
+              {{ hotel.hotelName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Room Type</label>
           <div class="room-type-filters">
             <button
               class="filter-btn"
@@ -135,9 +175,6 @@
               Suite
             </button>
           </div>
-          <button class="btn-clear" (click)="clearSearch()">
-            Clear Search
-          </button>
         </div>
       </div>
 
@@ -211,7 +248,7 @@
         <div class="no-results" *ngIf="filteredRooms.length === 0">
           <span class="empty-icon">😔</span>
           <h3>No Rooms Available</h3>
-          <p>Try adjusting your search dates or room type filter</p>
+          <p>Try adjusting your search dates or filters</p>
         </div>
       </div>
 

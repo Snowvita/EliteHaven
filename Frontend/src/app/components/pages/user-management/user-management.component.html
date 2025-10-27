@@ -1,0 +1,312 @@
+<div class="user-management-container">
+  <div class="user-management-content">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>User Management</h1>
+      <p class="subtitle">Manage all system users</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Role Tabs -->
+    <div class="role-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="selectedRole === 'ALL'"
+        (click)="filterByRole('ALL')"
+      >
+        📋 All Users
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedRole === 'CUSTOMER'"
+        (click)="filterByRole('CUSTOMER')"
+      >
+        👤 Customers
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedRole === 'STAFF'"
+        (click)="filterByRole('STAFF')"
+      >
+        👥 Staff
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedRole === 'DELETED'"
+        (click)="filterByRole('DELETED')"
+      >
+        🚫 Deleted
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="searchUsers()"
+        placeholder="Search by name or email..."
+        class="search-input"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-table-container" *ngIf="!isLoading">
+      <table class="users-table" *ngIf="filteredUsers.length > 0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let user of filteredUsers"
+            [class.deleted-row]="user.isDeleted === 1"
+          >
+            <td>#{{ user.userId }}</td>
+            <td>
+              {{ user.fullName }}
+              <span class="deleted-badge" *ngIf="user.isDeleted === 1"
+                >🚫 DELETED</span
+              >
+            </td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phoneNumber }}</td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="user.isDeleted !== 1"
+                [class.status-deleted]="user.isDeleted === 1"
+              >
+                {{ user.isDeleted === 1 ? "DELETED" : "ACTIVE" }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons" *ngIf="user.isDeleted !== 1">
+                <button class="btn-view" (click)="openDetailsModal(user)">
+                  👁️ View
+                </button>
+                <button class="btn-edit" (click)="openEditModal(user)">
+                  ✏️ Edit
+                </button>
+                <button class="btn-delete" (click)="deleteUser(user)">
+                  🗑️ Delete
+                </button>
+              </div>
+              <div class="deleted-actions" *ngIf="user.isDeleted === 1">
+                <span class="deleted-text">No actions available</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredUsers.length === 0">
+        <span class="empty-icon">👤</span>
+        <h3>No Users Found</h3>
+        <p *ngIf="searchTerm">Try adjusting your search term</p>
+        <p *ngIf="!searchTerm && selectedRole !== 'ALL'">
+          No {{ selectedRole.toLowerCase() }} users in the system
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit User</h2>
+      <button class="btn-close" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updateUser()">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input
+            type="text"
+            id="fullName"
+            [(ngModel)]="editForm.fullName"
+            name="fullName"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="editForm.email"
+            name="email"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input
+            type="number"
+            id="phone"
+            [(ngModel)]="editForm.phone"
+            name="phone"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role *</label>
+          <input
+            type="text"
+            id="role"
+            [(ngModel)]="editForm.role"
+            name="role"
+            class="form-input"
+            readonly
+          />
+        </div>
+
+        <!-- Show hotel selection only for STAFF -->
+        <div class="form-group" *ngIf="selectedUser?.role === 'STAFF'">
+          <label for="hotelId">Assigned Hotel</label>
+          <select
+            id="hotelId"
+            [(ngModel)]="editForm.hotelId"
+            name="hotelId"
+            class="form-input"
+          >
+            <option [value]="0">Select Hotel</option>
+            <option *ngFor="let hotel of hotels" [value]="hotel.hotelId">
+              {{ hotel.hotelName }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit">Update User</button>
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- User Details Modal -->
+<div
+  class="modal-overlay"
+  *ngIf="showDetailsModal"
+  (click)="closeDetailsModal()"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>User Details</h2>
+      <button class="btn-close" (click)="closeDetailsModal()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedUser">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">User ID:</span>
+          <span class="detail-value">#{{ selectedUser.userId }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Full Name:</span>
+          <span class="detail-value">{{ selectedUser.fullName }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value">{{ selectedUser.email }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Phone:</span>
+          <span class="detail-value">{{ selectedUser.phoneNumber }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Role:</span>
+          <span
+            class="role-badge"
+            [ngClass]="getRoleBadgeClass(selectedUser.role)"
+          >
+            {{ selectedUser.role }}
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span
+            class="status-badge"
+            [class.status-active]="selectedUser.isDeleted !== 1"
+            [class.status-deleted]="selectedUser.isDeleted === 1"
+          >
+            {{ selectedUser.isDeleted === 1 ? "🚫 DELETED" : "✅ ACTIVE" }}
+          </span>
+        </div>
+
+        <!-- Show additional info for STAFF -->
+        <div
+          class="detail-item full-width"
+          *ngIf="selectedUser?.role === 'STAFF'"
+        >
+          <span class="detail-label">Staff Information:</span>
+          <div class="staff-info-section">
+            <p>
+              <strong>Position:</strong>
+              {{ selectedUser?.staffRole || "Not Assigned" }}
+            </p>
+            <p>
+              <strong>Assigned Hotel:</strong>
+              {{ selectedUser?.hotelName || "No Hotel Assigned" }}
+            </p>
+            <p>
+              <strong>Hire Date:</strong> {{ selectedUser?.hireDate || "N/A" }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="closeDetailsModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

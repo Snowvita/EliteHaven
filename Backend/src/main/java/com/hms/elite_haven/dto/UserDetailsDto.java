@@ -33,4 +33,6 @@ public class UserDetailsDto {
 
     @Size(max = 50, message = "Role can be at most 50 characters")
     private String role; // CUSTOMER, STAFF, ADMIN
+
+    private Integer isDeleted = 0;
 }

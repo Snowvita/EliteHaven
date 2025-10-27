@@ -12,6 +12,12 @@ import { MyBookingsComponent } from './components/pages/my-bookings/my-bookings.
 import { authGuard, roleGuard } from './guards/auth.guard';
 import { AdminProfileComponent } from './components/pages/admin-profile/admin-profile.component';
 import { AddStaffComponent } from './components/pages/add-staff/add-staff.component';
+import { HotelManagementComponent } from './components/pages/hotel-management/hotel-management.component';
+import { RoomManagementComponent } from './components/pages/room-management/room-management.component';
+import { UserManagementComponent } from './components/pages/user-management/user-management.component';
+import { BookingManagementComponent } from './components/pages/booking-management/booking-management.component';
+import { ReportsComponent } from './components/pages/reports/reports.component';
+import { StaffBookingsComponent } from './components/pages/staff-bookings/staff-bookings.component';
 
 export const routes: Routes = [
   // Public routes
@@ -32,7 +38,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'STAFF' },
   },
-
+  {
+    path: 'staff-bookings',
+    component: StaffBookingsComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'STAFF' },
+  },
   // Customer-specific routes
   {
     path: 'profile',
@@ -63,13 +74,50 @@ export const routes: Routes = [
   {
     path: 'admin/profile',
     component: AdminProfileComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { role: 'ADMIN' },
+    canActivate: [authGuard],
+    // data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/profile',
+    component: AdminProfileComponent,
+    canActivate: [authGuard],
+    // data: { role: 'STAFF' },
   },
   {
     path: 'admin/add-staff',
     component: AddStaffComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/hotels',
+    component: HotelManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/users',
+    component: UserManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/rooms',
+    component: RoomManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/bookings',
+    component: BookingManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
+  },
+  {
+    path: 'admin/reports',
+    component: ReportsComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ADMIN' },
   },
 
   // Fallback

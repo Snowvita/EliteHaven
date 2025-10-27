@@ -45,7 +45,7 @@ public class StaffService {
         user.setFullName(staffDto.getFullName());
         user.setEmail(staffDto.getEmail());
         user.setPassword(passwordEncoder.encode(staffDto.getPassword()));
-        user.setPhone(staffDto.getPhone());
+        user.setPhoneNumber(staffDto.getPhone());
         user.setRoles(List.of(staffRole)); // Assign STAFF role
 
         userDao.save(user);
@@ -76,20 +76,48 @@ public class StaffService {
                 .orElseThrow(() -> new RuntimeException("Staff not found with ID: " + staffId));
     }
 
-    // Update staff details
+// Update staff details
     public StaffEntity updateStaff(Long staffId, StaffDto staffDto) {
         StaffEntity existing = getStaffById(staffId);
 
-        if (staffDto.getFullName() != null) existing.setFullName(staffDto.getFullName());
+        if (staffDto.getFullName() != null) {
+            existing.setFullName(staffDto.getFullName());
+            existing.getUser().setFullName(staffDto.getFullName()); // Update user too
+        }
+        
         if (staffDto.getEmail() != null) {
             existing.setEmail(staffDto.getEmail());
-            existing.getUser().setEmail(staffDto.getEmail()); // update UserEntity email too
-            userDao.save(existing.getUser());
+            existing.getUser().setEmail(staffDto.getEmail());
         }
-        if (staffDto.getPhone() != null) existing.setContactNumber(staffDto.getPhone());
-        if (staffDto.getRole() != null) existing.setRole(staffDto.getRole());
-        if (staffDto.getHiredDate() != null) existing.setHiredDate(staffDto.getHiredDate());
+        
+        if (staffDto.getPhone() != null) {
+            existing.setContactNumber(staffDto.getPhone());      // Updates staff table
+            existing.getUser().setPhoneNumber(staffDto.getPhone());    // ADD THIS - Updates user table
+        }
+        
+        if (staffDto.getRole() != null) {
+            existing.setRole(staffDto.getRole());
+        }
+        
+        if (staffDto.getHiredDate() != null) {
+            existing.setHiredDate(staffDto.getHiredDate());
+        }
+        
+        // Update hotel if provided
+        if (staffDto.getHotelId() != null && staffDto.getHotelId() > 0) {
+            existing.setHotel(hotelDao.findById(staffDto.getHotelId())
+                    .orElseThrow(() -> new RuntimeException("Hotel not found with ID: " + staffDto.getHotelId())));
+        }
+        
+        // Only update password if provided and not empty
+        if (staffDto.getPassword() != null && !staffDto.getPassword().trim().isEmpty()) {
+            existing.getUser().setPassword(passwordEncoder.encode(staffDto.getPassword()));
+        }
 
+        // Save user first
+        userDao.save(existing.getUser());
+        
+        // Then save staff
         return staffDao.save(existing);
     }
 

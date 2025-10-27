@@ -6,6 +6,7 @@ export type BookingStatus =
   | 'PENDING'
   | 'CONFIRMED'
   | 'CHECKED_IN'
+  | 'COMPLETED' // Add this
   | 'CANCELLED';
 
 export interface BookingModel {
@@ -16,6 +17,7 @@ export interface BookingModel {
   checkInDate: string;
   checkOutDate: string;
   status: BookingStatus;
+  totalPrice?: number;
 }
 
 export interface CreateBookingModel {

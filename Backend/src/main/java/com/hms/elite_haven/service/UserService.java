@@ -38,7 +38,7 @@ public class UserService {
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setPhone(dto.getPhone());
+        user.setPhoneNumber(dto.getPhone());
         user.setRoles(List.of(customerRole));
         user.setIsDeleted(0);
         userDao.save(user);
@@ -84,6 +84,7 @@ public class UserService {
 
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
         // Roles and password should be updated separately if needed
         userDao.save(user);
 

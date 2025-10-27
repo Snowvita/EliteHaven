@@ -34,7 +34,9 @@ export class StaffService {
   }
 
   deleteStaff(staffId: number): Observable<string> {
-    return this.http.delete<string>(`${this.baseUrl}/delete_staff/${staffId}`);
+    return this.http.delete(`${this.baseUrl}/delete_staff/${staffId}`, {
+      responseType: 'text', // ADD THIS - Tell Angular to expect text, not JSON
+    });
   }
 
   getStaffByHotel(hotelId: number): Observable<StaffModel[]> {

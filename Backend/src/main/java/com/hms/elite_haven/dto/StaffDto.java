@@ -40,7 +40,7 @@ public class StaffDto {
 
     private Timestamp hiredDate;
 
-    @NotBlank
-    @Size(min = 8, max = 24)
+    // @NotBlank
+    // @Size(min = 8, max = 24)
     private String password; // Optional: admin can set temporary password
 }

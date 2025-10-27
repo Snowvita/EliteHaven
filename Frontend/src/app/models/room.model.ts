@@ -3,7 +3,7 @@ import { HotelModel } from './hotel.model';
 export type RoomType = 'SINGLE' | 'DOUBLE' | 'SUITE';
 
 export interface RoomModel {
-  roomId: number;
+  roomId?: number;
   hotel: HotelModel;
   roomNumber: string;
   type: RoomType;

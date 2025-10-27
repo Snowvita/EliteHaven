@@ -167,8 +167,22 @@ export class AdminProfileComponent implements OnInit {
     }
     return this.passwordForm.newPassword === this.passwordForm.confirmPassword;
   }
-
   goBack(): void {
-    this.router.navigate(['/admin-dashboard']);
+    const userDetailsStr = localStorage.getItem('userDetails');
+
+    if (userDetailsStr) {
+      const userDetails = JSON.parse(userDetailsStr);
+      const role = userDetails.role;
+
+      if (role === 'ADMIN') {
+        this.router.navigate(['/admin-dashboard']);
+      } else if (role === 'STAFF') {
+        this.router.navigate(['/staff-dashboard']);
+      } else {
+        this.router.navigate(['/']); // Customer goes to home
+      }
+    } else {
+      this.router.navigate(['/signin']);
+    }
   }
 }

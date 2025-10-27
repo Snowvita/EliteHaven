@@ -1,0 +1,241 @@
+<div class="reports-container">
+  <div class="reports-content">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>Reports & Analytics</h1>
+      <p class="subtitle">
+        Comprehensive booking statistics and revenue insights
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Date Filter -->
+    <div class="filter-section">
+      <h3>📅 Filter by Date Range</h3>
+      <div class="date-filters">
+        <div class="filter-group">
+          <label for="startDate">Start Date:</label>
+          <input
+            type="date"
+            id="startDate"
+            [(ngModel)]="startDate"
+            class="date-input"
+          />
+        </div>
+        <div class="filter-group">
+          <label for="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            [(ngModel)]="endDate"
+            class="date-input"
+          />
+        </div>
+        <button class="btn-apply" (click)="applyDateFilter()">
+          Apply Filter
+        </button>
+        <button class="btn-export" (click)="exportToCSV()">
+          📥 Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading reports...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <!-- Main Statistics Cards -->
+      <div class="stats-grid">
+        <!-- Total Revenue -->
+        <div class="stat-card revenue">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>Total Revenue</h3>
+            <p class="stat-value">₹{{ totalRevenue | number : "1.0-0" }}</p>
+            <span class="stat-label"
+              >From
+              {{
+                confirmedBookings + completedBookings + checkedInBookings
+              }}
+              bookings</span
+            >
+          </div>
+        </div>
+
+        <!-- Average Booking Value -->
+        <div class="stat-card average">
+          <div class="stat-icon">💵</div>
+          <div class="stat-info">
+            <h3>Avg Booking Value</h3>
+            <p class="stat-value">
+              ₹{{ averageBookingValue | number : "1.0-0" }}
+            </p>
+            <span class="stat-label">Per booking</span>
+          </div>
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="stat-card bookings">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <h3>Total Bookings</h3>
+            <p class="stat-value">{{ totalBookings }}</p>
+            <span class="stat-label">In selected period</span>
+          </div>
+        </div>
+
+        <!-- Occupancy Rate -->
+        <div class="stat-card occupancy">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-info">
+            <h3>Occupancy Rate</h3>
+            <p class="stat-value">{{ occupancyRate | number : "1.0-2" }}%</p>
+            <span class="stat-label">Average occupancy</span>
+          </div>
+        </div>
+
+        <!-- Pending Bookings -->
+        <div class="stat-card pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>Pending</h3>
+            <p class="stat-value">{{ pendingBookings }}</p>
+            <span class="stat-label">Awaiting confirmation</span>
+          </div>
+        </div>
+
+        <!-- Confirmed Bookings -->
+        <div class="stat-card confirmed">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <h3>Confirmed</h3>
+            <p class="stat-value">{{ confirmedBookings }}</p>
+            <span class="stat-label">Active bookings</span>
+          </div>
+        </div>
+
+        <!-- Checked In -->
+        <div class="stat-card checked-in">
+          <div class="stat-icon">🔑</div>
+          <div class="stat-info">
+            <h3>Checked In</h3>
+            <p class="stat-value">{{ checkedInBookings }}</p>
+            <span class="stat-label">Currently staying</span>
+          </div>
+        </div>
+
+        <!-- Completed Bookings -->
+        <div class="stat-card completed">
+          <div class="stat-icon">✔️</div>
+          <div class="stat-info">
+            <h3>Completed</h3>
+            <p class="stat-value">{{ completedBookings }}</p>
+            <span class="stat-label">Finished stays</span>
+          </div>
+        </div>
+
+        <!-- Cancelled Bookings -->
+        <div class="stat-card cancelled">
+          <div class="stat-icon">❌</div>
+          <div class="stat-info">
+            <h3>Cancelled</h3>
+            <p class="stat-value">{{ cancelledBookings }}</p>
+            <span class="stat-label">Cancelled bookings</span>
+          </div>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="stat-card customers">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>Total Customers</h3>
+            <p class="stat-value">{{ totalCustomers }}</p>
+            <span class="stat-label">Registered customers</span>
+          </div>
+        </div>
+
+        <!-- Total Staff -->
+        <div class="stat-card staff">
+          <div class="stat-icon">👨‍💼</div>
+          <div class="stat-info">
+            <h3>Total Staff</h3>
+            <p class="stat-value">{{ totalStaff }}</p>
+            <span class="stat-label">Active employees</span>
+          </div>
+        </div>
+
+        <!-- Top Hotel -->
+        <div class="stat-card top-hotel">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-info">
+            <h3>Top Hotel</h3>
+            <p class="stat-value-text">{{ topHotel }}</p>
+            <span class="stat-label">Highest revenue</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel Performance -->
+      <div class="analytics-section" *ngIf="hotelStats.length > 0">
+        <h3>🏨 Hotel Performance</h3>
+        <div class="hotel-stats-table">
+          <table class="analytics-table">
+            <thead>
+              <tr>
+                <th>Hotel Name</th>
+                <th>Total Bookings</th>
+                <th>Revenue</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let hotel of hotelStats">
+                <td>
+                  <strong>{{ hotel.hotelName }}</strong>
+                </td>
+                <td>{{ hotel.totalBookings }}</td>
+                <td>₹{{ hotel.revenue | number : "1.0-0" }}</td>
+                <td>
+                  <div class="progress-bar">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="(hotel.revenue / totalRevenue) * 100"
+                    ></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Room Type Analytics -->
+      <div class="analytics-section" *ngIf="roomTypeStats.length > 0">
+        <h3>🛏️ Room Type Analytics</h3>
+        <div class="room-type-cards">
+          <div class="room-type-card" *ngFor="let roomType of roomTypeStats">
+            <h4>{{ roomType.type }}</h4>
+            <div class="room-stat">
+              <span class="stat-label">Bookings:</span>
+              <span class="stat-value">{{ roomType.count }}</span>
+            </div>
+            <div class="room-stat">
+              <span class="stat-label">Revenue:</span>
+              <span class="stat-value"
+                >₹{{ roomType.revenue | number : "1.0-0" }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,291 @@
+<div class="booking-management-container">
+  <div class="booking-management-content">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>Booking Management</h1>
+      <p class="subtitle">Manage all hotel bookings</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Status Tabs -->
+    <div class="status-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'ALL'"
+        (click)="filterByStatus('ALL')"
+      >
+        📋 All Bookings
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'PENDING'"
+        (click)="filterByStatus('PENDING')"
+      >
+        ⏳ Pending
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'CONFIRMED'"
+        (click)="filterByStatus('CONFIRMED')"
+      >
+        ✅ Confirmed
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'CHECKED_IN'"
+        (click)="filterByStatus('CHECKED_IN')"
+      >
+        🏨 Checked In
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'COMPLETED'"
+        (click)="filterByStatus('COMPLETED')"
+      >
+        ✔️ Completed
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedStatus === 'CANCELLED'"
+        (click)="filterByStatus('CANCELLED')"
+      >
+        ❌ Cancelled
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="searchBookings()"
+        placeholder="Search by booking ID, guest name, hotel..."
+        class="search-input"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading bookings...</p>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="bookings-table-container" *ngIf="!isLoading">
+      <table class="bookings-table" *ngIf="filteredBookings.length > 0">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Guest</th>
+            <th>Phone</th>
+            <th>Hotel</th>
+            <th>Room</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of filteredBookings">
+            <td>
+              <strong>#{{ booking.bookingId }}</strong>
+            </td>
+            <td>{{ booking.user.fullName }}</td>
+            <td>
+              {{ booking.user.phoneNumber || "N/A" }}
+            </td>
+            <td>{{ booking.room.hotel.hotelName }}</td>
+            <td>{{ booking.room.roomNumber }}</td>
+            <td>{{ formatDate(booking.checkInDate) }}</td>
+            <td>{{ formatDate(booking.checkOutDate) }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="getStatusBadgeClass(booking.status)"
+              >
+                {{ booking.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-view" (click)="openDetailsModal(booking)">
+                👁️ View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredBookings.length === 0">
+        <span class="empty-icon">📅</span>
+        <h3>No Bookings Found</h3>
+        <p *ngIf="searchTerm">Try adjusting your search term</p>
+        <p *ngIf="!searchTerm && selectedStatus !== 'ALL'">
+          No {{ selectedStatus.toLowerCase() }} bookings in the system
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div
+  class="modal-overlay"
+  *ngIf="showDetailsModal"
+  (click)="closeDetailsModal()"
+>
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Booking Details</h2>
+      <button class="btn-close" (click)="closeDetailsModal()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedBooking">
+      <div class="details-grid">
+        <!-- Booking Info -->
+        <div class="detail-section">
+          <h3>📋 Booking Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Booking ID:</span>
+            <span class="detail-value">#{{ selectedBooking.bookingId }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Status:</span>
+            <span
+              class="status-badge"
+              [ngClass]="getStatusBadgeClass(selectedBooking.status)"
+            >
+              {{ selectedBooking.status }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Check-In:</span>
+            <span class="detail-value">{{
+              formatDate(selectedBooking.checkInDate)
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Check-Out:</span>
+            <span class="detail-value">{{
+              formatDate(selectedBooking.checkOutDate)
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nights:</span>
+            <span class="detail-value">{{
+              calculateNights(
+                selectedBooking.checkInDate,
+                selectedBooking.checkOutDate
+              )
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Guest Info -->
+        <div class="detail-section">
+          <h3>👤 Guest Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Name:</span>
+            <span class="detail-value">{{
+              selectedBooking.user.fullName
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedBooking.user.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{
+              selectedBooking.user.phoneNumber || "N/A"
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Room Info -->
+        <div class="detail-section">
+          <h3>🏨 Room Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Hotel:</span>
+            <span class="detail-value">{{
+              selectedBooking.room.hotel.hotelName
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Room Number:</span>
+            <span class="detail-value">{{
+              selectedBooking.room.roomNumber
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Room Type:</span>
+            <span class="detail-value">{{
+              selectedBooking.room.type || selectedBooking.room.type || "N/A"
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons - UPDATED: REMOVED CONFIRM & CANCEL -->
+      <div class="modal-actions">
+        <!-- Only show Check In for CONFIRMED bookings -->
+        <button
+          class="btn-checkin"
+          *ngIf="selectedBooking.status === 'CONFIRMED'"
+          (click)="checkIn(selectedBooking.bookingId)"
+        >
+          🏨 Check In Guest
+        </button>
+
+        <!-- Only show Check Out for CHECKED_IN bookings -->
+        <button
+          class="btn-checkout"
+          *ngIf="selectedBooking.status === 'CHECKED_IN'"
+          (click)="checkOut(selectedBooking.bookingId)"
+        >
+          🚪 Check Out Guest
+        </button>
+
+        <!-- Show info message for other statuses -->
+        <div
+          class="info-message"
+          *ngIf="
+            selectedBooking.status === 'PENDING' ||
+            selectedBooking.status === 'CANCELLED' ||
+            selectedBooking.status === 'COMPLETED'
+          "
+        >
+          <p *ngIf="selectedBooking.status === 'PENDING'">
+            ⏳ Waiting for customer to confirm payment
+          </p>
+          <p *ngIf="selectedBooking.status === 'CANCELLED'">
+            ❌ This booking has been cancelled by the customer
+          </p>
+          <p *ngIf="selectedBooking.status === 'COMPLETED'">
+            ✅ This booking has been completed
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-close-modal"
+        (click)="closeDetailsModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

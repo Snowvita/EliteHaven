@@ -15,7 +15,9 @@ public class Mapper {
         dto.setUserId(user.getUserId());
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
-        dto.setPhoneNumber(user.getPhone());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setIsDeleted(user.getIsDeleted());
+
 
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             // Concatenate multiple roles as comma-separated string

@@ -1,1 +1,265 @@
-<p>staff-dashboard works!</p>
+<div class="staff-dashboard-container">
+  <div class="staff-dashboard-content">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-info">
+        <h1>Welcome back, {{ staffName }}! 👋</h1>
+        <p class="subtitle">{{ staffRole }} at {{ assignedHotel }}</p>
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading dashboard...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <!-- No Hotel Warning -->
+      <div class="warning-banner" *ngIf="!hotelId">
+        <span class="warning-icon">⚠️</span>
+        <div class="warning-content">
+          <h3>No Hotel Assigned</h3>
+          <p>Please contact your administrator to assign you to a hotel.</p>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card checkin">
+          <div class="stat-icon">🔑</div>
+          <div class="stat-info">
+            <h3>Today's Check-Ins</h3>
+            <p class="stat-value">{{ todayCheckIns }}</p>
+            <span class="stat-label">Arrivals expected</span>
+          </div>
+        </div>
+
+        <div class="stat-card checkout">
+          <div class="stat-icon">🚪</div>
+          <div class="stat-info">
+            <h3>Today's Check-Outs</h3>
+            <p class="stat-value">{{ todayCheckOuts }}</p>
+            <span class="stat-label">Departures expected</span>
+          </div>
+        </div>
+
+        <div class="stat-card guests">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>Current Guests</h3>
+            <p class="stat-value">{{ currentGuests }}</p>
+            <span class="stat-label">Checked in now</span>
+          </div>
+        </div>
+
+        <div class="stat-card pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h3>Pending Bookings</h3>
+            <p class="stat-value">{{ pendingBookings }}</p>
+            <span class="stat-label">Awaiting confirmation</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Check-Ins Section -->
+      <div class="action-section" *ngIf="todayCheckIns > 0">
+        <div class="section-header">
+          <h2>
+            🔑 Today's Arrivals ({{ getFilteredCheckInBookings().length }} of
+            {{ todayCheckIns }})
+          </h2>
+          <button class="btn-view-all" (click)="viewAllCheckIns()">
+            View All →
+          </button>
+        </div>
+
+        <!-- Enhanced Filters -->
+        <div class="filter-controls">
+          <div class="search-filter">
+            <input
+              type="text"
+              [(ngModel)]="checkInSearchTerm"
+              placeholder="🔍 Search by name, room, or phone..."
+              class="search-input-enhanced"
+            />
+          </div>
+          <div class="sort-filter">
+            <label>Sort by:</label>
+            <select [(ngModel)]="checkInSortBy" class="sort-select">
+              <option value="name">Guest Name</option>
+              <option value="room">Room Number</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Booking Cards -->
+        <div
+          class="booking-cards"
+          *ngIf="getFilteredCheckInBookings().length > 0"
+        >
+          <div
+            class="booking-card"
+            *ngFor="let booking of getFilteredCheckInBookings()"
+          >
+            <div class="booking-info">
+              <h3>{{ booking.user.fullName }}</h3>
+              <p class="booking-detail">
+                📍 Room {{ booking.room.roomNumber }}
+              </p>
+              <p class="booking-detail">
+                📱 {{ booking.user.phoneNumber || "N/A" }}
+              </p>
+            </div>
+            <button
+              class="btn-action btn-checkin"
+              (click)="checkIn(booking.bookingId)"
+            >
+              Check In
+            </button>
+          </div>
+        </div>
+
+        <!-- No results message -->
+        <div
+          class="no-results"
+          *ngIf="getFilteredCheckInBookings().length === 0 && checkInSearchTerm"
+        >
+          <p>❌ No arrivals found matching "{{ checkInSearchTerm }}"</p>
+          <button class="btn-clear" (click)="checkInSearchTerm = ''">
+            Clear Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Today's Check-Outs Section -->
+      <div class="action-section" *ngIf="todayCheckOuts > 0">
+        <div class="section-header">
+          <h2>
+            🚪 Today's Departures ({{ getFilteredCheckOutBookings().length }} of
+            {{ todayCheckOuts }})
+          </h2>
+          <button class="btn-view-all" (click)="viewAllCheckOuts()">
+            View All →
+          </button>
+        </div>
+
+        <!-- Enhanced Filters -->
+        <div class="filter-controls">
+          <div class="search-filter">
+            <input
+              type="text"
+              [(ngModel)]="checkOutSearchTerm"
+              placeholder="🔍 Search by name, room, or phone..."
+              class="search-input-enhanced"
+            />
+          </div>
+          <div class="sort-filter">
+            <label>Sort by:</label>
+            <select [(ngModel)]="checkOutSortBy" class="sort-select">
+              <option value="name">Guest Name</option>
+              <option value="room">Room Number</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Booking Cards -->
+        <div
+          class="booking-cards"
+          *ngIf="getFilteredCheckOutBookings().length > 0"
+        >
+          <div
+            class="booking-card"
+            *ngFor="let booking of getFilteredCheckOutBookings()"
+          >
+            <div class="booking-info">
+              <h3>{{ booking.user.fullName }}</h3>
+              <p class="booking-detail">
+                📍 Room {{ booking.room.roomNumber }}
+              </p>
+              <p class="booking-detail">
+                📱 {{ booking.user.phoneNumber || "N/A" }}
+              </p>
+            </div>
+            <button
+              class="btn-action btn-checkout"
+              (click)="checkOut(booking.bookingId)"
+            >
+              Check Out
+            </button>
+          </div>
+        </div>
+
+        <!-- No results message -->
+        <div
+          class="no-results"
+          *ngIf="
+            getFilteredCheckOutBookings().length === 0 && checkOutSearchTerm
+          "
+        >
+          <p>❌ No departures found matching "{{ checkOutSearchTerm }}"</p>
+          <button class="btn-clear" (click)="checkOutSearchTerm = ''">
+            Clear Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State - No activity today -->
+      <div
+        class="empty-state"
+        *ngIf="todayCheckIns === 0 && todayCheckOuts === 0 && hotelId"
+      >
+        <span class="empty-icon">✨</span>
+        <h3>No Activity Today</h3>
+        <p>No check-ins or check-outs scheduled for today.</p>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-section">
+        <h2>Quick Actions</h2>
+        <div class="action-cards">
+          <button class="action-card" routerLink="/staff-bookings">
+            <span class="action-icon">📅</span>
+            <h3>All Bookings</h3>
+            <p>View and manage all bookings</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Today's Activity Summary -->
+      <div class="activity-section" *ngIf="hotelId">
+        <h2>Today's Activity Summary</h2>
+        <div class="activity-grid">
+          <div class="activity-item">
+            <span class="activity-icon">✅</span>
+            <div class="activity-details">
+              <h4>Expected Arrivals</h4>
+              <p class="activity-count">{{ todayCheckIns }} guests</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-icon">👋</span>
+            <div class="activity-details">
+              <h4>Expected Departures</h4>
+              <p class="activity-count">{{ todayCheckOuts }} guests</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-icon">🏨</span>
+            <div class="activity-details">
+              <h4>Currently Staying</h4>
+              <p class="activity-count">{{ currentGuests }} guests</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

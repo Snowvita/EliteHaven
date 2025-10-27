@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HotelService } from '../../../services/hotel.service';
 import { RoomService } from '../../../services/room.service';
 import { RoomPhotoService } from '../../../services/room-photo.service';
@@ -21,12 +21,15 @@ export class LandingPageComponent implements OnInit {
   checkOutDate: string = '';
   searchTerm: string = '';
   roomTypeFilter: string = 'ALL';
+  selectedLocationFilter: string = 'ALL';
+  selectedHotelFilter: string | number = 0; // Allow string from select
 
   hotels: HotelModel[] = [];
   filteredHotels: HotelModel[] = [];
   availableRooms: RoomModel[] = [];
   filteredRooms: RoomModel[] = [];
   roomPhotosMap: Map<number, RoomPhotoModel[]> = new Map();
+  availableLocations: string[] = [];
   isLoading: boolean = false;
   searchPerformed: boolean = false;
 
@@ -79,6 +82,7 @@ export class LandingPageComponent implements OnInit {
       next: (data) => {
         this.hotels = data;
         this.filteredHotels = data;
+        this.loadLocations();
         this.isLoading = false;
       },
       error: (error) => {
@@ -86,6 +90,17 @@ export class LandingPageComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  // Extract unique locations from hotels
+  loadLocations(): void {
+    const locations = new Set<string>();
+    this.hotels.forEach((hotel) => {
+      if (hotel.location) {
+        locations.add(hotel.location);
+      }
+    });
+    this.availableLocations = Array.from(locations).sort();
   }
 
   onSearchChange(term: string): void {
@@ -126,9 +141,13 @@ export class LandingPageComponent implements OnInit {
       .getAvailableRooms(this.checkInDate, this.checkOutDate)
       .subscribe({
         next: (data) => {
-          this.availableRooms = data;
-          this.filteredRooms = data;
-          this.applyRoomTypeFilter();
+          // Filter out deleted rooms and rooms from deleted hotels
+          this.availableRooms = data.filter(
+            (room) =>
+              room.isDeleted === 0 && room.hotel && room.hotel.isDeleted === 0
+          );
+          this.filteredRooms = this.availableRooms;
+          this.applyAllFilters();
           this.loadRoomPhotos();
           this.isLoading = false;
         },
@@ -142,14 +161,23 @@ export class LandingPageComponent implements OnInit {
   loadRoomPhotos(): void {
     if (this.availableRooms.length === 0) return;
 
-    const photoRequests = this.availableRooms.map((room) =>
-      this.roomPhotoService.getPhotosByRoomId(room.roomId)
+    // Filter out rooms without roomId
+    const roomsWithId = this.availableRooms.filter(
+      (room) => room.roomId !== undefined
+    );
+
+    if (roomsWithId.length === 0) return;
+
+    const photoRequests = roomsWithId.map((room) =>
+      this.roomPhotoService.getPhotosByRoomId(room.roomId!)
     );
 
     forkJoin(photoRequests).subscribe({
       next: (photosArrays) => {
-        this.availableRooms.forEach((room, index) => {
-          this.roomPhotosMap.set(room.roomId, photosArrays[index]);
+        roomsWithId.forEach((room, index) => {
+          if (room.roomId !== undefined) {
+            this.roomPhotosMap.set(room.roomId!, photosArrays[index]);
+          }
         });
       },
       error: (error) => {
@@ -158,28 +186,76 @@ export class LandingPageComponent implements OnInit {
     });
   }
 
-  filterByRoomType(type: string): void {
-    this.roomTypeFilter = type;
-    this.applyRoomTypeFilter();
-  }
-
-  applyRoomTypeFilter(): void {
-    if (this.roomTypeFilter === 'ALL') {
-      this.filteredRooms = this.availableRooms;
-    } else {
-      this.filteredRooms = this.availableRooms.filter(
-        (room) => room.type === this.roomTypeFilter
-      );
-    }
-  }
-
   getPrimaryPhoto(room: RoomModel): string {
+    // Check if roomId exists
+    if (!room.roomId) {
+      return 'assets/room-placeholder.avif';
+    }
+
     const photos = this.roomPhotosMap.get(room.roomId);
     if (photos && photos.length > 0) {
       const primary = photos.find((p) => p.isPrimary);
       return primary ? primary.photoUrl : photos[0].photoUrl;
     }
-    return 'assets/room-placeholder.jpg';
+    return 'assets/room-placeholder.avif';
+  }
+
+  // Apply all filters to rooms
+  applyAllFilters(): void {
+    let filtered = this.availableRooms;
+
+    // Filter by location
+    if (this.selectedLocationFilter !== 'ALL') {
+      filtered = filtered.filter(
+        (room) =>
+          room.hotel && room.hotel.location === this.selectedLocationFilter
+      );
+    }
+
+    // Filter by hotel - Convert to number for comparison
+    if (this.selectedHotelFilter !== 0) {
+      const hotelIdNum = Number(this.selectedHotelFilter);
+      filtered = filtered.filter(
+        (room) => room.hotel && room.hotel.hotelId === hotelIdNum
+      );
+    }
+
+    // Filter by room type
+    if (this.roomTypeFilter !== 'ALL') {
+      filtered = filtered.filter((room) => room.type === this.roomTypeFilter);
+    }
+
+    this.filteredRooms = filtered;
+  }
+
+  filterByRoomType(type: string): void {
+    this.roomTypeFilter = type;
+    this.applyAllFilters();
+  }
+
+  onLocationFilterChange(): void {
+    this.selectedHotelFilter = 0; // Reset hotel filter when location changes
+    this.applyAllFilters();
+  }
+
+  onHotelFilterChange(): void {
+    // Convert string to number
+    this.selectedHotelFilter = Number(this.selectedHotelFilter);
+    this.applyAllFilters();
+  }
+
+  applyRoomTypeFilter(): void {
+    this.applyAllFilters();
+  }
+
+  // Get hotels for the selected location
+  getHotelsForLocation(): HotelModel[] {
+    if (this.selectedLocationFilter === 'ALL') {
+      return this.hotels;
+    }
+    return this.hotels.filter(
+      (h) => h.location === this.selectedLocationFilter
+    );
   }
 
   openCalendar(type: 'checkIn' | 'checkOut'): void {
@@ -328,6 +404,8 @@ export class LandingPageComponent implements OnInit {
     this.roomPhotosMap.clear();
     this.searchTerm = '';
     this.roomTypeFilter = 'ALL';
+    this.selectedLocationFilter = 'ALL';
+    this.selectedHotelFilter = 0;
     this.filteredHotels = this.hotels;
   }
 

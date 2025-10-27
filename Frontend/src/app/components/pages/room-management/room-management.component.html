@@ -1,0 +1,357 @@
+<div class="room-management-container">
+  <div class="room-management-content">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>Room Management</h1>
+      <p class="subtitle">Manage all rooms across hotels</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="filter-section">
+        <select
+          [(ngModel)]="selectedHotelFilter"
+          (change)="onHotelFilterChange()"
+          class="filter-select"
+        >
+          <option value="0">All Hotels</option>
+          <option *ngFor="let hotel of hotels" [value]="hotel.hotelId">
+            {{ hotel.hotelName }}
+          </option>
+        </select>
+
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="searchRooms()"
+            placeholder="Search by room number, type..."
+            class="search-input"
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <button class="btn-add" (click)="openAddModal()">➕ Add New Room</button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading rooms...</p>
+    </div>
+
+    <!-- Rooms Grid -->
+    <div class="rooms-grid" *ngIf="!isLoading && filteredRooms.length > 0">
+      <div class="room-card" *ngFor="let room of filteredRooms">
+        <div class="room-header">
+          <div class="room-info">
+            <h3>Room {{ room.roomNumber }}</h3>
+            <p class="room-hotel">🏨 {{ room.hotel.hotelName }}</p>
+          </div>
+          <div
+            class="room-type-badge"
+            [class]="'badge-' + room.type.toLowerCase()"
+          >
+            {{ room.type }}
+          </div>
+        </div>
+
+        <div class="room-body">
+          <div class="room-details">
+            <div class="detail-item">
+              <strong>Location:</strong> {{ room.hotel.location }}
+            </div>
+            <div class="detail-item price">
+              <strong>Price per Night:</strong>
+              <span class="price-value">₹{{ room.pricePerNight }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="room-actions">
+          <button class="btn-photo" (click)="openPhotoModal(room)">
+            📷 Photos
+          </button>
+          <button class="btn-edit" (click)="openEditModal(room)">
+            ✏️ Edit
+          </button>
+          <button
+            class="btn-delete"
+            (click)="deleteRoom(room.roomId, room.roomNumber)"
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredRooms.length === 0">
+      <div class="empty-icon">🛏️</div>
+      <h3>No Rooms Found</h3>
+      <p *ngIf="searchTerm || selectedHotelFilter !== 0">
+        Try adjusting your filters
+      </p>
+      <p *ngIf="!searchTerm && selectedHotelFilter === 0">
+        Get started by adding your first room
+      </p>
+      <button
+        class="btn-add"
+        (click)="openAddModal()"
+        *ngIf="!searchTerm && selectedHotelFilter === 0"
+      >
+        ➕ Add New Room
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Room Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Room</h2>
+      <button class="btn-close" (click)="closeAddModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="addRoom()">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="hotelId">Select Hotel *</label>
+          <select
+            id="hotelId"
+            [(ngModel)]="roomForm.hotel.hotelId"
+            name="hotelId"
+            class="form-input"
+            required
+          >
+            <option value="0" disabled>Choose a hotel</option>
+            <option *ngFor="let hotel of hotels" [value]="hotel.hotelId">
+              {{ hotel.hotelName }} - {{ hotel.location }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="roomNumber">Room Number *</label>
+            <input
+              type="text"
+              id="roomNumber"
+              [(ngModel)]="roomForm.roomNumber"
+              name="roomNumber"
+              class="form-input"
+              placeholder="101, 102, etc."
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="type">Room Type *</label>
+            <select
+              id="type"
+              [(ngModel)]="roomForm.type"
+              name="type"
+              class="form-input"
+              required
+            >
+              <option *ngFor="let type of roomTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pricePerNight">Price per Night (Rs. ) *</label>
+          <input
+            type="number"
+            id="pricePerNight"
+            [(ngModel)]="roomForm.pricePerNight"
+            name="pricePerNight"
+            class="form-input"
+            placeholder="99.99"
+            min="1"
+            step="0.01"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit">Add Room</button>
+        <button type="button" class="btn-cancel" (click)="closeAddModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Room Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Room</h2>
+      <button class="btn-close" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updateRoom()">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editHotelId">Select Hotel *</label>
+          <select
+            id="editHotelId"
+            [(ngModel)]="roomForm.hotel.hotelId"
+            name="hotelId"
+            class="form-input"
+            required
+          >
+            <option value="0" disabled>Choose a hotel</option>
+            <option *ngFor="let hotel of hotels" [value]="hotel.hotelId">
+              {{ hotel.hotelName }} - {{ hotel.location }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editRoomNumber">Room Number *</label>
+            <input
+              type="text"
+              id="editRoomNumber"
+              [(ngModel)]="roomForm.roomNumber"
+              name="roomNumber"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="editType">Room Type *</label>
+            <select
+              id="editType"
+              [(ngModel)]="roomForm.type"
+              name="type"
+              class="form-input"
+              required
+            >
+              <option *ngFor="let type of roomTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editPricePerNight">Price per Night ($) *</label>
+          <input
+            type="number"
+            id="editPricePerNight"
+            [(ngModel)]="roomForm.pricePerNight"
+            name="pricePerNight"
+            class="form-input"
+            min="1"
+            step="0.01"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit">Update Room</button>
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Photo Management Modal -->
+<div class="modal-overlay" *ngIf="showPhotoModal" (click)="closePhotoModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Manage Photos - Room {{ currentRoomForPhotos?.roomNumber }}</h2>
+      <button class="btn-close" (click)="closePhotoModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Add Photo Section -->
+      <div class="add-photo-section">
+        <h3>Add New Photo</h3>
+        <div class="photo-input-group">
+          <input
+            type="text"
+            [(ngModel)]="newPhotoUrl"
+            placeholder="Enter photo URL..."
+            class="form-input"
+          />
+          <button class="btn-add-photo" (click)="addPhoto()">
+            ➕ Add Photo
+          </button>
+        </div>
+      </div>
+
+      <!-- Photos Grid -->
+      <div class="photos-section">
+        <h3>Room Photos</h3>
+
+        <div class="loading-state" *ngIf="isLoadingPhotos">
+          <div class="spinner-small"></div>
+          <p>Loading photos...</p>
+        </div>
+
+        <div
+          class="photos-grid"
+          *ngIf="!isLoadingPhotos && roomPhotos.length > 0"
+        >
+          <div class="photo-item" *ngFor="let photo of roomPhotos">
+            <div class="photo-wrapper">
+              <img [src]="photo.photoUrl" [alt]="'Room photo'" />
+              <div class="photo-badge" *ngIf="photo.isPrimary">⭐ Primary</div>
+            </div>
+            <div class="photo-actions">
+              <button
+                class="btn-primary-photo"
+                (click)="setPrimaryPhoto(photo.photoId)"
+                *ngIf="!photo.isPrimary"
+              >
+                Set Primary
+              </button>
+              <button
+                class="btn-delete-photo"
+                (click)="deletePhoto(photo.photoId)"
+              >
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="empty-photos"
+          *ngIf="!isLoadingPhotos && roomPhotos.length === 0"
+        >
+          <p>📷 No photos added yet. Add your first photo above!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="closePhotoModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

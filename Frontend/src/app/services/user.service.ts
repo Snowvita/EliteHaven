@@ -44,6 +44,8 @@ export class UserService {
   }
 
   deleteUser(userId: number): Observable<string> {
-    return this.http.delete<string>(`${this.baseUrl}/delete_user/${userId}`);
+    return this.http.delete(`${this.baseUrl}/delete_user/${userId}`, {
+      responseType: 'text',
+    });
   }
 }

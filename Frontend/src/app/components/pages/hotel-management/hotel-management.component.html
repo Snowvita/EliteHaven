@@ -1,0 +1,265 @@
+<div class="hotel-management-container">
+  <div class="hotel-management-content">
+    <!-- Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        <span class="icon">←</span> Back to Dashboard
+      </button>
+      <h1>Hotel Management</h1>
+      <p class="subtitle">Manage all hotels in the system</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="searchHotels()"
+          placeholder="Search by hotel name or location..."
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+      <button class="btn-add" (click)="openAddModal()">➕ Add New Hotel</button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner-large"></div>
+      <p>Loading hotels...</p>
+    </div>
+
+    <!-- Hotels Grid -->
+    <div class="hotels-grid" *ngIf="!isLoading && filteredHotels.length > 0">
+      <div class="hotel-card" *ngFor="let hotel of filteredHotels">
+        <div class="hotel-image" *ngIf="hotel.photoUrl">
+          <img [src]="hotel.photoUrl" [alt]="hotel.hotelName" />
+        </div>
+        <div class="hotel-image placeholder" *ngIf="!hotel.photoUrl">
+          <span class="placeholder-icon">🏨</span>
+        </div>
+
+        <div class="hotel-header">
+          <div class="hotel-info">
+            <h3>{{ hotel.hotelName }}</h3>
+            <p class="hotel-location">📍 {{ hotel.location }}</p>
+          </div>
+        </div>
+
+        <div class="hotel-body">
+          <p class="hotel-description">
+            {{ hotel.description || "No description available" }}
+          </p>
+
+          <div class="hotel-details">
+            <div class="detail-item" *ngIf="hotel.contactNumber">
+              <strong>Contact:</strong> {{ hotel.contactNumber }}
+            </div>
+          </div>
+        </div>
+
+        <div class="hotel-actions">
+          <button class="btn-edit" (click)="openEditModal(hotel)">
+            ✏️ Edit
+          </button>
+          <button
+            class="btn-delete"
+            (click)="deleteHotel(hotel.hotelId, hotel.hotelName)"
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredHotels.length === 0">
+      <div class="empty-icon">🏨</div>
+      <h3>No Hotels Found</h3>
+      <p *ngIf="searchTerm">Try adjusting your search criteria</p>
+      <p *ngIf="!searchTerm">Get started by adding your first hotel</p>
+      <button class="btn-add" (click)="openAddModal()" *ngIf="!searchTerm">
+        ➕ Add New Hotel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Hotel Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Hotel</h2>
+      <button class="btn-close" (click)="closeAddModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="addHotel()">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hotelName">Hotel Name *</label>
+            <input
+              type="text"
+              id="hotelName"
+              [(ngModel)]="hotelForm.hotelName"
+              name="hotelName"
+              class="form-input"
+              placeholder="Enter hotel name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location *</label>
+            <input
+              type="text"
+              id="location"
+              [(ngModel)]="hotelForm.location"
+              name="location"
+              class="form-input"
+              placeholder="City, State"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="hotelForm.description"
+            name="description"
+            class="form-textarea"
+            placeholder="Describe the hotel..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="contactNumber">Contact Number</label>
+          <input
+            type="text"
+            id="contactNumber"
+            [(ngModel)]="hotelForm.contactNumber"
+            name="contactNumber"
+            class="form-input"
+            placeholder="+1234567890"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="photoUrl">Photo URL</label>
+          <input
+            type="text"
+            id="photoUrl"
+            [(ngModel)]="hotelForm.photoUrl"
+            name="photoUrl"
+            class="form-input"
+            placeholder="https://example.com/hotel-photo.jpg"
+          />
+          <small class="input-hint"
+            >Enter the full URL of the hotel image</small
+          >
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit">Add Hotel</button>
+        <button type="button" class="btn-cancel" (click)="closeAddModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Hotel Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Hotel</h2>
+      <button class="btn-close" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updateHotel()">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editHotelName">Hotel Name *</label>
+            <input
+              type="text"
+              id="editHotelName"
+              [(ngModel)]="hotelForm.hotelName"
+              name="hotelName"
+              class="form-input"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="editLocation">Location *</label>
+            <input
+              type="text"
+              id="editLocation"
+              [(ngModel)]="hotelForm.location"
+              name="location"
+              class="form-input"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Description</label>
+          <textarea
+            id="editDescription"
+            [(ngModel)]="hotelForm.description"
+            name="description"
+            class="form-textarea"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="editContactNumber">Contact Number</label>
+          <input
+            type="text"
+            id="editContactNumber"
+            [(ngModel)]="hotelForm.contactNumber"
+            name="contactNumber"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="editPhotoUrl">Photo URL</label>
+          <input
+            type="text"
+            id="editPhotoUrl"
+            [(ngModel)]="hotelForm.photoUrl"
+            name="photoUrl"
+            class="form-input"
+            placeholder="https://example.com/hotel-photo.jpg"
+          />
+          <small class="input-hint"
+            >Enter the full URL of the hotel image</small
+          >
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit">Update Hotel</button>
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

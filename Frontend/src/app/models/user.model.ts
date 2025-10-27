@@ -16,6 +16,7 @@ export interface UserModel {
   email: string;
   phoneNumber: number; // Backend returns 'phoneNumber' in UserDetailsDto
   role: string; // Single role as string
+  isDeleted?: number;
 }
 
 export interface RoleModel {

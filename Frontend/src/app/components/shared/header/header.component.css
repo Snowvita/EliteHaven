@@ -31,10 +31,19 @@
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
+  height: 70px;
+  width: 70px;
   object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #667eea; /* ← Add colored border */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ← Subtle shadow */
+}
+
+.logo:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px;
 }
 
 .app-name {
