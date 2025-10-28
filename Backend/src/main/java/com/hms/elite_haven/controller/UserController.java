@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,12 +37,14 @@ public class UserController {
 
     // Get all users (Admin)
     @GetMapping("/all_users")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDetailsDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     // Get all active users (Admin)
     @GetMapping("/active_users")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDetailsDto>> getAllActiveUsers() {
         return ResponseEntity.ok(userService.getAllActiveUsers());
     }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.hms.elite_haven.dao.entity.StaffEntity;
@@ -21,6 +22,7 @@ public class StaffController {
 
     // Create a new staff (Admin only)
     @PostMapping("/create_staff")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StaffEntity> createStaff(@RequestBody @Valid StaffDto staffDto) {
         StaffEntity createdStaff = staffService.createStaff(staffDto);
         return ResponseEntity.ok(createdStaff);
@@ -28,6 +30,7 @@ public class StaffController {
 
     // Get all staff
     @GetMapping("/all_staffs")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<StaffEntity>> getAllStaff() {
         List<StaffEntity> staffList = staffService.getAllStaff();
         return ResponseEntity.ok(staffList);
@@ -51,6 +54,7 @@ public class StaffController {
 
     // Soft delete staff
     @DeleteMapping("/delete_staff/{staffId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteStaff(@PathVariable Long staffId) {
         staffService.deleteStaff(staffId);
         return ResponseEntity.ok("Staff deleted successfully");

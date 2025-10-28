@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.hms.elite_haven.dao.entity.BookingEntity;
@@ -21,11 +22,11 @@ public class BookingController {
     private BookingService bookingService;
 
     // Create a new booking (without payment)
-@PostMapping("/create_booking")
-public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody BookingRequestDto bookingDto) {
-    BookingEntity createdBooking = bookingService.createBooking(bookingDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
-}
+    @PostMapping("/create_booking")
+    public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody BookingRequestDto bookingDto) {
+        BookingEntity createdBooking = bookingService.createBooking(bookingDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
+    }
 
 
     // Confirm booking (after payment)
@@ -43,6 +44,7 @@ public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody BookingRe
     }
 
     // Check-in
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @PutMapping("/checkin/{bookingId}")
     public ResponseEntity<BookingEntity> checkIn(@PathVariable Long bookingId) {
         BookingEntity checkedInBooking = bookingService.checkIn(bookingId);
@@ -57,6 +59,7 @@ public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody BookingRe
     }
 
     // Get all bookings
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @GetMapping("/all_bookings")
     public ResponseEntity<List<BookingEntity>> getAllBookings() {
         List<BookingEntity> bookings = bookingService.getAllBookings();

@@ -1,6 +1,5 @@
 package com.hms.elite_haven.service;
 
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))  // ✅ Added "ROLE_" prefix
                 .collect(Collectors.toList());
     }
 
