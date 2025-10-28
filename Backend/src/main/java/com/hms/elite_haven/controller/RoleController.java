@@ -1,13 +1,21 @@
 package com.hms.elite_haven.controller;
 
-import com.hms.elite_haven.dao.entity.RoleEntity;
-import com.hms.elite_haven.service.RoleService;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.hms.elite_haven.dao.entity.RoleEntity;
+import com.hms.elite_haven.service.RoleService;
 
 import jakarta.validation.Valid;
 
@@ -20,6 +28,7 @@ public class RoleController {
 
     // Create new role
     @PostMapping("/create_role")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleEntity> createRole(@RequestBody @Valid RoleEntity role) {
         RoleEntity createdRole = roleService.createRole(role);
         return ResponseEntity.ok(createdRole);
