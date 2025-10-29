@@ -1,5 +1,5 @@
 -- Elite Haven Database Initialization Script
-
+--change
 -- Add unique constraint to prevent duplicate role assignments
 -- 1️⃣ Roles
 INSERT IGNORE INTO roles (role_id, role_name) VALUES
